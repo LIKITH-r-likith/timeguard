@@ -1,0 +1,672 @@
+openapi: 3.0.3
+info:
+  title: TimeGuard API
+  version: 0.1.0
+  description: |
+    Contract between the backend (Person 3) and the frontend (Person 4).
+    Schemas mirror backend/core/models.py (Person 1). This file is the source
+    of truth for the frontend. Person 3 regenerates the TypeScript types on
+    every change and posts it in the team chat.
+
+    Rules
+    - Timestamps are ISO-8601 with a UTC offset. IDs are strings.
+    - Errors use {code, message, details}.
+    - The LLM never writes. Only POST /proposals/{id}/approve changes a timecard.
+    - Demo auth: role and employee id come from headers (X-Role, X-Employee-Id).
+
+servers:
+  - url: http://localhost:8000
+
+tags:
+  - name: detection
+  - name: proposals
+  - name: audit
+  - name: observability
+
+paths:
+  /scan:
+    post:
+      tags: [detection]
+      summary: Detect exceptions for a pay period
+      description: Roles allowed - MANAGER, HR.
+      operationId: scan
+      parameters:
+        - $ref: '#/components/parameters/Role'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScanRequest'
+      responses:
+        '200':
+          description: Exceptions found and stored
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScanResponse'
+        '403':
+          $ref: '#/components/responses/Error'
+
+  /exceptions:
+    get:
+      tags: [detection]
+      summary: Exception queue, filtered by status and risk
+      description: Roles allowed - MANAGER, HR. Sorted by risk, highest first.
+      operationId: listExceptions
+      parameters:
+        - $ref: '#/components/parameters/Role'
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/ExceptionStatus'
+        - name: risk
+          in: query
+          schema:
+            $ref: '#/components/schemas/RiskTier'
+      responses:
+        '200':
+          description: The queue
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ExceptionRecord'
+        '403':
+          $ref: '#/components/responses/Error'
+
+  /exceptions/{id}:
+    get:
+      tags: [detection]
+      summary: One exception with its timecard and policy context
+      description: Roles allowed - MANAGER, HR, EMPLOYEE (own exceptions only).
+      operationId: getException
+      parameters:
+        - $ref: '#/components/parameters/Role'
+        - $ref: '#/components/parameters/EmployeeId'
+        - $ref: '#/components/parameters/ExceptionId'
+      responses:
+        '200':
+          description: Exception detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionDetail'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+
+  /exceptions/{id}/resolve:
+    post:
+      tags: [proposals]
+      summary: Run the agent on an exception
+      description: |
+        Roles allowed - MANAGER, HR. Runs the agent, validates the proposal,
+        stores it, and returns the proposal with its validation result.
+        The timecard is NOT changed by this call.
+      operationId: resolveException
+      parameters:
+        - $ref: '#/components/parameters/Role'
+        - $ref: '#/components/parameters/ExceptionId'
+      responses:
+        '200':
+          description: Proposal and validation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProposalRecord'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+
+  /proposals/{id}/confirm:
+    post:
+      tags: [proposals]
+      summary: Employee confirms a proposed punch
+      description: Role allowed - EMPLOYEE (the employee the proposal is about).
+      operationId: confirmProposal
+      parameters:
+        - $ref: '#/components/parameters/Role'
+        - $ref: '#/components/parameters/EmployeeId'
+        - $ref: '#/components/parameters/ProposalId'
+      responses:
+        '200':
+          description: Updated proposal
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProposalRecord'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+
+  /proposals/{id}/approve:
+    post:
+      tags: [proposals]
+      summary: Approve a proposal (the only write to a timecard)
+      description: |
+        Roles allowed - MANAGER; HR for HIGH risk. Applies the validated
+        changes to the timecard and writes an audit entry. Fails with 409 if
+        the proposal needs employee confirmation and has none, or if the pay
+        period is locked.
+      operationId: approveProposal
+      parameters:
+        - $ref: '#/components/parameters/Role'
+        - $ref: '#/components/parameters/ProposalId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DecisionRequest'
+      responses:
+        '200':
+          description: Approved proposal
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProposalRecord'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+
+  /proposals/{id}/reject:
+    post:
+      tags: [proposals]
+      summary: Reject a proposal
+      description: Roles allowed - MANAGER; HR for HIGH risk. Timecard is unchanged.
+      operationId: rejectProposal
+      parameters:
+        - $ref: '#/components/parameters/Role'
+        - $ref: '#/components/parameters/ProposalId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DecisionRequest'
+      responses:
+        '200':
+          description: Rejected proposal
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProposalRecord'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+
+  /audit:
+    get:
+      tags: [audit]
+      summary: Append-only audit log
+      description: Roles allowed - MANAGER, HR.
+      operationId: listAudit
+      parameters:
+        - $ref: '#/components/parameters/Role'
+        - name: entity_id
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Audit entries in order
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AuditEntry'
+        '403':
+          $ref: '#/components/responses/Error'
+
+  /audit/verify:
+    get:
+      tags: [audit]
+      summary: Verify the audit hash chain
+      description: Roles allowed - MANAGER, HR.
+      operationId: verifyAudit
+      parameters:
+        - $ref: '#/components/parameters/Role'
+      responses:
+        '200':
+          description: Chain status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditVerifyResult'
+        '403':
+          $ref: '#/components/responses/Error'
+
+  /runs/{trace_id}:
+    get:
+      tags: [observability]
+      summary: Full trace of one agent run
+      description: Roles allowed - MANAGER, HR.
+      operationId: getRun
+      parameters:
+        - $ref: '#/components/parameters/Role'
+        - name: trace_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Run trace
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RunTrace'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+
+  /metrics:
+    get:
+      tags: [observability]
+      summary: Operational metrics
+      description: Open to anyone.
+      operationId: getMetrics
+      responses:
+        '200':
+          description: Current metrics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Metrics'
+
+  /evals/latest:
+    get:
+      tags: [observability]
+      summary: Latest eval report (produced by Person 2's runner)
+      description: Open to anyone.
+      operationId: getLatestEval
+      responses:
+        '200':
+          description: Eval report
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvalReport'
+        '404':
+          $ref: '#/components/responses/Error'
+
+components:
+  parameters:
+    Role:
+      name: X-Role
+      in: header
+      required: true
+      description: Demo auth. Who is calling.
+      schema:
+        $ref: '#/components/schemas/Role'
+    EmployeeId:
+      name: X-Employee-Id
+      in: header
+      required: false
+      description: Required when X-Role is EMPLOYEE.
+      schema:
+        type: string
+    ExceptionId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+    ProposalId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+
+  responses:
+    Error:
+      description: Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+  schemas:
+    # ---------------- Enums (frozen at hour 3) ----------------
+    ExceptionType:
+      type: string
+      enum: [MISSED_PUNCH, OVERTIME_RISK, MEAL_BREAK_VIOLATION, SCHEDULE_LEAVE_CONFLICT, REST_PERIOD_BREACH]
+    ProposalAction:
+      type: string
+      enum: [ADD_PUNCH, ADJUST_PUNCH, INSERT_BREAK, REQUEST_EMPLOYEE_CONFIRMATION, FLAG_OVERTIME_FOR_APPROVAL, ESCALATE_TO_HR]
+    RiskTier:
+      type: string
+      enum: [LOW, MEDIUM, HIGH]
+    Role:
+      type: string
+      enum: [EMPLOYEE, MANAGER, HR]
+    PunchType:
+      type: string
+      enum: [IN, OUT, BREAK_START, BREAK_END]
+    ExceptionStatus:
+      type: string
+      enum: [OPEN, PROPOSED, AWAITING_EMPLOYEE, AWAITING_APPROVAL, RESOLVED, REJECTED, ESCALATED]
+    Jurisdiction:
+      type: string
+      description: Policy pack key, e.g. CA or KA. Free string so new packs need no code change.
+      example: CA
+
+    # ---------------- Timecard data ----------------
+    Punch:
+      type: object
+      required: [id, employee_id, type, at]
+      properties:
+        id: {type: string}
+        employee_id: {type: string}
+        type: {$ref: '#/components/schemas/PunchType'}
+        at: {type: string, format: date-time}
+    Shift:
+      type: object
+      required: [id, employee_id, start, end]
+      properties:
+        id: {type: string}
+        employee_id: {type: string}
+        start: {type: string, format: date-time}
+        end: {type: string, format: date-time}
+        scheduled_break_minutes: {type: integer, default: 0}
+    Leave:
+      type: object
+      required: [id, employee_id, start, end]
+      properties:
+        id: {type: string}
+        employee_id: {type: string}
+        start: {type: string, format: date-time}
+        end: {type: string, format: date-time}
+        kind: {type: string, default: PAID}
+    Timecard:
+      type: object
+      required: [id, employee_id, jurisdiction, period_start, period_end]
+      properties:
+        id: {type: string}
+        employee_id: {type: string}
+        jurisdiction: {$ref: '#/components/schemas/Jurisdiction'}
+        period_start: {type: string, format: date}
+        period_end: {type: string, format: date}
+        locked: {type: boolean, default: false}
+        shifts:
+          type: array
+          items: {$ref: '#/components/schemas/Shift'}
+        punches:
+          type: array
+          items: {$ref: '#/components/schemas/Punch'}
+        leaves:
+          type: array
+          items: {$ref: '#/components/schemas/Leave'}
+        notes:
+          type: array
+          description: Untrusted employee text. Display as data only.
+          items: {type: string}
+
+    # ---------------- Policy ----------------
+    PolicyClause:
+      type: object
+      required: [id, title, text]
+      properties:
+        id: {type: string, example: CA-OT-DAILY-01}
+        title: {type: string}
+        text: {type: string}
+        params:
+          type: object
+          additionalProperties: {type: number}
+
+    # ---------------- Exceptions ----------------
+    ExceptionRecord:
+      type: object
+      required: [id, type, employee_id, timecard_id, work_date, detail, status]
+      properties:
+        id: {type: string, example: exc_0142}
+        type: {$ref: '#/components/schemas/ExceptionType'}
+        employee_id: {type: string}
+        timecard_id: {type: string}
+        work_date: {type: string, format: date}
+        detail: {type: string}
+        policy_clauses:
+          type: array
+          items: {type: string}
+        status: {$ref: '#/components/schemas/ExceptionStatus'}
+        risk:
+          allOf:
+            - $ref: '#/components/schemas/RiskTier'
+          nullable: true
+    ExceptionDetail:
+      type: object
+      required: [exception, timecard, policy_clauses]
+      properties:
+        exception: {$ref: '#/components/schemas/ExceptionRecord'}
+        timecard: {$ref: '#/components/schemas/Timecard'}
+        policy_clauses:
+          type: array
+          items: {$ref: '#/components/schemas/PolicyClause'}
+        proposal:
+          allOf:
+            - $ref: '#/components/schemas/ProposalRecord'
+          nullable: true
+
+    # ---------------- Proposal ----------------
+    EvidenceRef:
+      type: object
+      required: [kind, id]
+      properties:
+        kind: {type: string, enum: [punch, shift, leave, history]}
+        id: {type: string}
+    Change:
+      type: object
+      required: [op]
+      properties:
+        op: {type: string, enum: [add_punch, adjust_punch, insert_break]}
+        type:
+          allOf:
+            - $ref: '#/components/schemas/PunchType'
+          nullable: true
+        at: {type: string, format: date-time, nullable: true}
+        punch_id: {type: string, nullable: true}
+        break_start: {type: string, format: date-time, nullable: true}
+        break_end: {type: string, format: date-time, nullable: true}
+    Proposal:
+      type: object
+      required: [exception_id, action, rationale, confidence]
+      properties:
+        exception_id: {type: string}
+        action: {$ref: '#/components/schemas/ProposalAction'}
+        changes:
+          type: array
+          items: {$ref: '#/components/schemas/Change'}
+        rationale: {type: string}
+        evidence:
+          type: array
+          items: {$ref: '#/components/schemas/EvidenceRef'}
+        policy_clauses:
+          type: array
+          items: {type: string}
+        confidence: {type: number, minimum: 0, maximum: 1}
+        needs_employee_confirmation: {type: boolean, default: false}
+
+    # ---------------- Validation and resolution ----------------
+    PayImpact:
+      type: object
+      properties:
+        regular_minutes_delta: {type: integer, default: 0}
+        overtime_minutes_delta: {type: integer, default: 0}
+        estimated_cost_delta: {type: number, default: 0}
+        currency: {type: string, default: INR}
+    CheckResult:
+      type: object
+      required: [name, passed]
+      properties:
+        name: {type: string, example: target_exception_cleared}
+        passed: {type: boolean}
+        detail: {type: string}
+    ValidationResult:
+      type: object
+      required: [passed, checks]
+      properties:
+        passed: {type: boolean}
+        checks:
+          type: array
+          items: {$ref: '#/components/schemas/CheckResult'}
+        pay_impact:
+          allOf:
+            - $ref: '#/components/schemas/PayImpact'
+          nullable: true
+    ResolutionResult:
+      type: object
+      required: [proposal, validation, attempts, used_fallback, trace_id]
+      properties:
+        proposal: {$ref: '#/components/schemas/Proposal'}
+        validation: {$ref: '#/components/schemas/ValidationResult'}
+        attempts:
+          type: integer
+          description: 1 = passed first try, 2 = passed after one repair.
+        used_fallback: {type: boolean}
+        trace_id: {type: string}
+        input_tokens: {type: integer, default: 0}
+        output_tokens: {type: integer, default: 0}
+        latency_ms: {type: integer, default: 0}
+
+    # ---------------- API-level objects (Person 3 mirrors these in Pydantic) ----------------
+    ProposalRecord:
+      type: object
+      required: [id, exception_id, status, resolution]
+      properties:
+        id: {type: string, example: prop_0031}
+        exception_id: {type: string}
+        status:
+          type: string
+          enum: [PENDING_CONFIRMATION, PENDING_APPROVAL, APPROVED, REJECTED]
+        risk: {$ref: '#/components/schemas/RiskTier'}
+        resolution: {$ref: '#/components/schemas/ResolutionResult'}
+        confirmed_at: {type: string, format: date-time, nullable: true}
+        decided_by: {type: string, nullable: true}
+        decided_at: {type: string, format: date-time, nullable: true}
+        decision_comment: {type: string, nullable: true}
+    ScanRequest:
+      type: object
+      required: [period_start, period_end]
+      properties:
+        period_start: {type: string, format: date}
+        period_end: {type: string, format: date}
+    ScanResponse:
+      type: object
+      required: [found, exceptions]
+      properties:
+        found: {type: integer}
+        exceptions:
+          type: array
+          items: {$ref: '#/components/schemas/ExceptionRecord'}
+    DecisionRequest:
+      type: object
+      properties:
+        comment: {type: string}
+
+    # ---------------- Audit ----------------
+    AuditEntry:
+      type: object
+      required: [seq, at, actor, role, action, entity_type, entity_id, prev_hash, hash]
+      properties:
+        seq: {type: integer}
+        at: {type: string, format: date-time}
+        actor: {type: string}
+        role: {$ref: '#/components/schemas/Role'}
+        action: {type: string, example: PROPOSAL_APPROVED}
+        entity_type: {type: string, example: proposal}
+        entity_id: {type: string}
+        payload:
+          type: object
+          additionalProperties: true
+        prev_hash: {type: string}
+        hash: {type: string}
+    AuditVerifyResult:
+      type: object
+      required: [valid, entries_checked]
+      properties:
+        valid: {type: boolean}
+        entries_checked: {type: integer}
+        first_bad_seq: {type: integer, nullable: true}
+
+    # ---------------- Observability and evals ----------------
+    RunStep:
+      type: object
+      required: [kind, at]
+      properties:
+        kind:
+          type: string
+          description: tool_call, llm_call, validation, repair, fallback
+        at: {type: string, format: date-time}
+        name: {type: string}
+        input:
+          type: object
+          additionalProperties: true
+        output:
+          type: object
+          additionalProperties: true
+        latency_ms: {type: integer}
+    RunTrace:
+      type: object
+      required: [trace_id, exception_id, steps]
+      properties:
+        trace_id: {type: string}
+        exception_id: {type: string}
+        prompt_version: {type: string}
+        steps:
+          type: array
+          items: {$ref: '#/components/schemas/RunStep'}
+    Metrics:
+      type: object
+      properties:
+        exceptions_found: {type: integer}
+        validator_first_pass_rate: {type: number}
+        validator_pass_after_repair_rate: {type: number}
+        repair_rate: {type: number}
+        fallback_rate: {type: number}
+        avg_latency_ms: {type: number}
+        total_input_tokens: {type: integer}
+        total_output_tokens: {type: integer}
+    EvalReport:
+      type: object
+      properties:
+        generated_at: {type: string, format: date-time}
+        model: {type: string}
+        prompt_version: {type: string}
+        replay_mode: {type: boolean}
+        detection_recall: {type: number}
+        detection_precision: {type: number}
+        first_attempt_pass_rate: {type: number}
+        pass_rate_after_repair: {type: number}
+        correct_action_rate: {type: number}
+        hallucinated_evidence_rate: {type: number}
+        escalation_correctness: {type: number}
+        injection_resistance: {type: number}
+        ablation:
+          type: object
+          properties:
+            unsafe_llm_alone: {type: integer}
+            unsafe_with_harness: {type: integer}
+            cases: {type: integer}
+
+    # ---------------- Errors ----------------
+    ErrorResponse:
+      type: object
+      required: [code, message]
+      properties:
+        code: {type: string, example: FORBIDDEN}
+        message: {type: string}
+        details:
+          type: object
+          additionalProperties: true

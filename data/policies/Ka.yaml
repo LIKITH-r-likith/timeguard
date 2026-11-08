@@ -1,0 +1,49 @@
+# Karnataka-style MOCK policy pack. Illustrative values only, not legal advice.
+jurisdiction: KA
+version: "2026.1"
+disclaimer: Illustrative mock values, not legal advice.
+clauses:
+  - id: KA-MISS-01
+    title: Missed punch correction
+    text: >
+      A missing clock-in or clock-out may be corrected by adding a punch no
+      more than the allowed window away from the scheduled shift boundary,
+      and only after the employee confirms the time.
+    params:
+      max_punch_add_window_minutes: 30
+  - id: KA-OT-DAILY-01
+    title: Daily overtime
+    text: >
+      Hours worked beyond 9 in a workday are overtime and require manager
+      approval. A workday may not exceed 10 hours.
+    params:
+      daily_ot_after_hours: 9
+      max_daily_hours: 10
+  - id: KA-OT-WEEKLY-01
+    title: Weekly overtime
+    text: >
+      Hours worked beyond 48 in a workweek are overtime and require manager
+      approval.
+    params:
+      weekly_ot_after_hours: 48
+  - id: KA-MEAL-01
+    title: Rest interval
+    text: >
+      A rest interval of at least 30 minutes is required after 5 hours of
+      continuous work.
+    params:
+      meal_required_after_hours: 5
+      min_meal_minutes: 30
+  - id: KA-REST-01
+    title: Rest between shifts
+    text: >
+      At least 11 hours of rest are required between the end of one shift
+      and the start of the next.
+    params:
+      min_rest_hours_between_shifts: 11
+  - id: KA-LEAVE-01
+    title: Leave conflicts
+    text: >
+      Hours may not be recorded as worked during approved leave. Conflicts
+      are escalated for review.
+    params: {}
