@@ -71,7 +71,10 @@ async def lifespan(app: FastAPI):
     init_db()
     from backend.app.db import SessionLocal
     with SessionLocal() as session:
-        load_seed_timecards(session)
+        from backend.app.models import TimecardModel
+        if session.query(TimecardModel).count() == 0:
+            from data.seed.seed import seed_database
+            seed_database(session)
     yield
 
 

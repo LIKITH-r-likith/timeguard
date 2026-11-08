@@ -198,6 +198,9 @@ def get_llm(mode: str | None = None) -> LLMClient:
     m = (mode or os.environ.get("LLM_MODE", "live")).lower()
     if m == "mock":
         return MockLLM()
+    if m == "demo":
+        from backend.agent.demo_script import ScriptedLLM
+        return ScriptedLLM()
     if m == "replay":
         return ReplayLLM()
     # live mode
