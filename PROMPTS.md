@@ -50,7 +50,7 @@ Read AGENTS.md first. Plan first, then build.
 Implement a FastAPI service that matches contracts/openapi.yaml exactly (paths, roles, request and response shapes, error format). Add `fastapi`, `uvicorn`, `sqlalchemy>=2`, `httpx` to requirements.txt.
 1. SQLAlchemy 2 models on SQLite (`timeguard.db`): employees, shifts, punches, leaves, timecards, exceptions, proposals, approvals, audit_log, runs.
 2. `DbContextProvider` implementing the ContextProvider protocol (read-only) in `backend/app/context.py`.
-3. Roles from headers `X-Role` (EMPLOYEE, MANAGER, HR) and `X-User-Id`. Enforce the role rules in the OpenAPI file. Risk tiers: LOW needs employee confirmation then manager; MEDIUM manager; HIGH HR.
+3. Roles from headers `X-Role` (EMPLOYEE, MANAGER, HR) and `X-Employee-Id`. Enforce the role rules in the OpenAPI file. Risk tiers: LOW needs employee confirmation then manager; MEDIUM manager; HIGH HR.
 4. Pipeline: `POST /scan` runs backend.core.api.detect for the pay period and stores exceptions with risk unknown; `POST /exceptions/{id}/resolve` calls backend.agent.api.resolve (LLM_MODE decides mock/replay/live), stores proposal and validation, computes risk_tier and pay_impact, sets ExceptionStatus.
 5. `approve`/`reject`/`confirm` endpoints. Approve is the ONLY code path that modifies punches, and it re-runs validate() right before writing. Locked periods never change.
 6. Append-only audit log. Each row stores the SHA-256 of the previous row (hash chain). `GET /audit` and `GET /audit/verify` (returns ok or the first broken row). Log every scan, resolve, confirm, approve, reject, escalate, with actor and role.
@@ -71,7 +71,7 @@ Fix bugs you find in backend/app or backend/agent, but do not edit backend/core.
 
 ## PROMPT 5: Frontend console (frontend/)
 Read AGENTS.md first. Plan first, then build with Vite + React + TypeScript + Tailwind.
-1. Generate TypeScript types from contracts/openapi.yaml with `openapi-typescript` (npm script `gen:types`). Use only these types for API data. API base URL from env, default http://localhost:8000. A role switcher in the header sets X-Role and X-User-Id.
+1. Generate TypeScript types from contracts/openapi.yaml with `openapi-typescript` (npm script `gen:types`). Use only these types for API data. API base URL from env, default http://localhost:8000. A role switcher in the header sets X-Role and X-Employee-Id.
 2. Screens:
    - Exception queue: table with risk badge, type, employee, date, status; filters; "Scan pay period" button.
    - Exception detail: a horizontal day timeline (SVG) showing the shift, punches, breaks and the overtime zone, so a missed punch is visible at a glance.
