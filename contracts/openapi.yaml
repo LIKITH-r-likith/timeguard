@@ -98,6 +98,33 @@ paths:
         '404':
           $ref: '#/components/responses/Error'
 
+  /employees/{id}/confirmations:
+    get:
+      tags: [proposals]
+      summary: Pending proposals awaiting confirmation for an employee
+      description: Roles allowed - EMPLOYEE (own id only), MANAGER, HR.
+      operationId: listEmployeeConfirmations
+      parameters:
+        - $ref: '#/components/parameters/Role'
+        - $ref: '#/components/parameters/EmployeeId'
+        - name: id
+          in: path
+          required: true
+          description: Employee ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of pending confirmations with context
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ExceptionDetail'
+        '403':
+          $ref: '#/components/responses/Error'
+
   /exceptions/{id}/resolve:
     post:
       tags: [proposals]

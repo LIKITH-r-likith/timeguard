@@ -117,3 +117,49 @@ def test_manager_cannot_approve_high_risk(client: TestClient, monkeypatch):
         json={"comment": "HR approving"},
     )
     assert hr_appr.status_code == 200
+
+
+def test_employee_confirmations_endpoint(client: TestClient, monkeypatch):
+    """Test GET /employees/{id}/confirmations permissions and data."""
+    orig_resolve = agent_api.resolve
+
+    def mock_resolve_need_conf(exception_id, ctx, llm=None):
+        exc = ctx.get_exception(exception_id)
+        proposal_dict = {
+            "exception_id": exc.id,
+            "action": "ADD_PUNCH",
+            "changes": [{"op": "add_punch", "type": "OUT", "at": "2026-11-03T17:00:00+05:30"}],
+            "rationale": "Needs confirmation",
+            "evidence": [{"kind": "punch", "id": "p_88"}],
+            "policy_clauses": ["CA-MISS-01"],
+            "confidence": 0.95,
+            "needs_employee_confirmation": True,
+        }
+        return orig_resolve(exception_id, ctx, llm=MockLLM([LLMResponse(text=json.dumps(proposal_dict))]))
+
+    monkeypatch.setattr(agent_api, "resolve", mock_resolve_need_conf)
+
+    client.post("/scan", headers={"X-Role": "MANAGER"}, json={"period_start": "2026-11-02", "period_end": "2026-11-08"})
+    list_resp = client.get("/exceptions", headers={"X-Role": "MANAGER"}).json()
+    e01_exc = next(e for e in list_resp if e["employee_id"] == "e01")
+
+    # Resolve it so it moves to AWAITING_EMPLOYEE
+    client.post(f"/exceptions/{e01_exc['id']}/resolve", headers={"X-Role": "MANAGER"})
+
+    # 1. e01 can view own confirmations
+    resp_e01 = client.get("/employees/e01/confirmations", headers={"X-Role": "EMPLOYEE", "X-Employee-Id": "e01"})
+    assert resp_e01.status_code == 200
+    confs = resp_e01.json()
+    assert len(confs) >= 1
+    assert confs[0]["exception"]["employee_id"] == "e01"
+    assert confs[0]["proposal"]["status"] == "PENDING_CONFIRMATION"
+
+    # 2. e02 cannot view e01's confirmations (403)
+    resp_e02 = client.get("/employees/e01/confirmations", headers={"X-Role": "EMPLOYEE", "X-Employee-Id": "e02"})
+    assert resp_e02.status_code == 403
+    assert resp_e02.json()["code"] == "FORBIDDEN"
+
+    # 3. Manager can view e01's confirmations
+    resp_mgr = client.get("/employees/e01/confirmations", headers={"X-Role": "MANAGER"})
+    assert resp_mgr.status_code == 200
+

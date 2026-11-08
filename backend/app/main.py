@@ -330,6 +330,68 @@ def get_exception_detail(
     )
 
 
+@app.get(
+    "/employees/{id}/confirmations",
+    response_model=list[ExceptionDetail],
+    tags=["proposals"],
+    summary="Pending proposals awaiting confirmation for an employee",
+)
+def list_employee_confirmations(
+    id: str,
+    auth: AuthContext = Depends(get_auth_context),
+    db: Session = Depends(get_db),
+):
+    if auth.role == Role.EMPLOYEE and auth.employee_id != id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={"code": "FORBIDDEN", "message": "Employees may only access their own confirmations", "details": {}},
+        )
+
+    stmt = (
+        select(ExceptionModel)
+        .where(
+            ExceptionModel.employee_id == id,
+            ExceptionModel.status == ExceptionStatus.AWAITING_EMPLOYEE.value,
+        )
+    )
+    rows = db.execute(stmt).scalars().all()
+    ctx = DbContextProvider(db)
+    result = []
+    for r in rows:
+        exc = ctx.get_exception(r.id)
+        timecard = ctx.get_timecard(exc.timecard_id)
+        policy = ctx.get_policy_pack(timecard.jurisdiction)
+        clauses: list[PolicyClause] = []
+        if policy:
+            wanted = set(exc.policy_clauses)
+            clauses = [c for c in policy.clauses if c.id in wanted]
+
+        prop_stmt = select(ProposalModel).where(ProposalModel.exception_id == r.id)
+        prop_row = db.execute(prop_stmt).scalar_one_or_none()
+        prop_record: Optional[ProposalRecord] = None
+        if prop_row:
+            prop_record = ProposalRecord(
+                id=prop_row.id,
+                exception_id=prop_row.exception_id,
+                status=prop_row.status,
+                risk=RiskTier(prop_row.risk),
+                resolution=ResolutionResult.model_validate(prop_row.resolution),
+                confirmed_at=datetime.fromisoformat(prop_row.confirmed_at) if prop_row.confirmed_at else None,
+                decided_by=prop_row.decided_by,
+                decided_at=datetime.fromisoformat(prop_row.decided_at) if prop_row.decided_at else None,
+                decision_comment=prop_row.decision_comment,
+            )
+        result.append(
+            ExceptionDetail(
+                exception=exc,
+                timecard=timecard,
+                policy_clauses=clauses,
+                proposal=prop_record,
+            )
+        )
+    return result
+
+
 @app.post(
     "/exceptions/{id}/resolve",
     response_model=ProposalRecord,
