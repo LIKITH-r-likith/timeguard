@@ -219,10 +219,17 @@ def resolve_loop(
     messages: list[dict] = [{"role": "system", "content": system_msg}]
 
     # 4. First attempt: tool loop + parse + validate
-    loop_res = _run_tool_loop(llm, messages, ctx, trace)
-    resp = loop_res.response
+    llm_err1: Exception | None = None
+    loop_res: ToolLoopResult | None = None
+    resp = LLMResponse()
+    try:
+        loop_res = _run_tool_loop(llm, messages, ctx, trace)
+        resp = loop_res.response
+    except Exception as e:
+        llm_err1 = e
+        trace.add("llm_error", {"attempt": 1, "error": str(e)})
 
-    if loop_res.policy_not_found:
+    if loop_res is not None and loop_res.policy_not_found:
         trace.add("policy_not_found", {"reason": "search_policy returned found=False"})
         proposal = _escalate_proposal(exc, "Policy search found no matching clauses. Escalating to HR.")
         vr = validate(proposal, timecard, policy, exception=exc)
@@ -239,7 +246,12 @@ def resolve_loop(
             latency_ms=latency,
         )
 
-    proposal = _parse_proposal(resp.text)
+    proposal: Proposal | None = None
+    if llm_err1 is None:
+        proposal = _parse_proposal(resp.text)
+        trace.add("attempt_1", {"text": resp.text, "proposal": proposal.model_dump(mode="json") if proposal else None})
+    else:
+        trace.add("attempt_1", {"error": str(llm_err1), "proposal": None})
 
     if proposal is not None:
         vr = validate(proposal, timecard, policy, exception=exc)
@@ -263,19 +275,29 @@ def resolve_loop(
             )
         failed_checks = vr.checks
     else:
-        trace.add("validation", {"attempt": 1, "passed": False, "error": "JSON parse failure"})
-        failed_checks = [CheckResult(name="json_parse", passed=False, detail="Could not parse proposal JSON.")]
+        if llm_err1 is not None:
+            failed_checks = [CheckResult(name="llm_error", passed=False, detail=f"LLM call failed: {llm_err1}")]
+        else:
+            trace.add("validation", {"attempt": 1, "passed": False, "error": "JSON parse failure"})
+            failed_checks = [CheckResult(name="json_parse", passed=False, detail="Could not parse proposal JSON.")]
 
     # 5. Repair attempt
     repair_msg = _build_repair_message(failed_checks)
     messages.append({"role": "user", "content": repair_msg})
-    loop_res2 = _run_tool_loop(llm, messages, ctx, trace)
-    resp2 = loop_res2.response
+    llm_err2: Exception | None = None
+    loop_res2: ToolLoopResult | None = None
+    resp2 = LLMResponse()
+    try:
+        loop_res2 = _run_tool_loop(llm, messages, ctx, trace)
+        resp2 = loop_res2.response
+    except Exception as e:
+        llm_err2 = e
+        trace.add("llm_error", {"attempt": 2, "error": str(e)})
 
     total_input = resp.input_tokens + resp2.input_tokens
     total_output = resp.output_tokens + resp2.output_tokens
 
-    if loop_res2.policy_not_found:
+    if loop_res2 is not None and loop_res2.policy_not_found:
         trace.add("policy_not_found", {"reason": "search_policy returned found=False on repair"})
         proposal = _escalate_proposal(exc, "Policy search found no matching clauses. Escalating to HR.")
         vr = validate(proposal, timecard, policy, exception=exc)
@@ -292,7 +314,9 @@ def resolve_loop(
             latency_ms=latency,
         )
 
-    proposal2 = _parse_proposal(resp2.text)
+    proposal2: Proposal | None = None
+    if llm_err2 is None:
+        proposal2 = _parse_proposal(resp2.text)
 
     if proposal2 is not None:
         vr2 = validate(proposal2, timecard, policy, exception=exc)
@@ -316,7 +340,12 @@ def resolve_loop(
             )
 
     # 6. Both attempts failed — use deterministic fallback
-    trace.add("fallback", {"reason": "Two LLM attempts failed validation"})
+    reason = "Two LLM attempts failed validation"
+    if llm_err2 is not None:
+        reason = f"Repair attempt failed with LLM error: {llm_err2}"
+    elif llm_err1 is not None:
+        reason = f"Initial attempt had LLM error ({llm_err1}), repair failed validation"
+    trace.add("fallback", {"reason": reason})
     fb = fallback_proposal(exc)
     fb_vr = validate(fb, timecard, policy, exception=exc)
     latency = int((time.monotonic() - t0) * 1000)

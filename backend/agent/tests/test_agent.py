@@ -577,3 +577,105 @@ class TestGoldenCases:
             if result.proposal.action.value in forbidden:
                 # This is acceptable only if it went to fallback
                 assert result.used_fallback or result.proposal.action == ProposalAction.ESCALATE_TO_HR
+
+
+# ---------------------------------------------------------------------------
+# Resilience to LLM Transport Errors
+# ---------------------------------------------------------------------------
+
+def test_resolve_recovers_after_attempt_1_connection_error() -> None:
+    """Attempt 1 raises ConnectionError; repair attempt succeeds with valid proposal."""
+    ctx = InMemoryContextProvider(CASE_MISSED)
+    exc_id = ctx.exceptions[0].id
+
+    # Valid proposal for attempt 2
+    good_prop = _proposal_json(
+        exc_id,
+        action="ADD_PUNCH",
+        changes=[{"op": "add_punch", "type": "OUT", "at": "2026-11-03T17:00:00+05:30"}],
+        evidence=[
+            {"kind": "punch", "id": "p_88"},
+            {"kind": "shift", "id": "s_12"},
+        ],
+        clauses=["CA-MISS-01"],
+    )
+
+    # Attempt 1 raises ConnectionError; Attempt 2 returns valid proposal
+    mock = MockLLM([
+        ConnectionError("Groq API unreachable"),
+        LLMResponse(text=good_prop),
+    ])
+
+    result = resolve(exc_id, ctx, llm=mock)
+
+    assert result.attempts == 2
+    assert result.used_fallback is False
+    assert result.validation.passed is True
+    assert result.proposal.action == ProposalAction.ADD_PUNCH
+
+    trace = get_trace(result.trace_id)
+    assert trace is not None
+    error_steps = [s for s in trace.steps if s.kind == "llm_error"]
+    assert len(error_steps) >= 1
+    assert "Groq API unreachable" in error_steps[0].data.get("error", "")
+
+
+def test_resolve_falls_back_when_both_attempts_fail_with_connection_error() -> None:
+    """Both attempts raise ConnectionError; loop must NOT crash and must use deterministic fallback."""
+    ctx = InMemoryContextProvider(CASE_MISSED)
+    exc_id = ctx.exceptions[0].id
+
+    mock = MockLLM([
+        ConnectionError("Groq timeout attempt 1"),
+        ConnectionError("Groq timeout attempt 2"),
+    ])
+
+    result = resolve(exc_id, ctx, llm=mock)
+
+    assert result.attempts == 2
+    assert result.used_fallback is True
+    assert result.validation.passed is True
+    # Safe fallback for missed punch is REQUEST_EMPLOYEE_CONFIRMATION
+    assert result.proposal.action == ProposalAction.REQUEST_EMPLOYEE_CONFIRMATION
+
+    trace = get_trace(result.trace_id)
+    assert trace is not None
+    error_steps = [s for s in trace.steps if s.kind == "llm_error"]
+    assert len(error_steps) == 2
+    fallback_steps = [s for s in trace.steps if s.kind == "fallback"]
+    assert len(fallback_steps) == 1
+
+
+def test_resolve_falls_back_on_timeout_error() -> None:
+    """TimeoutError on both attempts handled gracefully with fallback."""
+    ctx = InMemoryContextProvider(CASE_MISSED)
+    exc_id = ctx.exceptions[0].id
+
+    mock = MockLLM([
+        TimeoutError("Connection timed out 1"),
+        TimeoutError("Connection timed out 2"),
+    ])
+
+    result = resolve(exc_id, ctx, llm=mock)
+
+    assert result.used_fallback is True
+    assert result.attempts == 2
+    assert result.validation.passed is True
+
+
+def test_resolve_repair_after_bad_json_then_connection_error() -> None:
+    """Attempt 1 produces bad JSON, repair attempt raises ConnectionError -> deterministic fallback."""
+    ctx = InMemoryContextProvider(CASE_MISSED)
+    exc_id = ctx.exceptions[0].id
+
+    mock = MockLLM([
+        LLMResponse(text="INVALID { NON-JSON"),
+        ConnectionError("Network drop during repair"),
+    ])
+
+    result = resolve(exc_id, ctx, llm=mock)
+
+    assert result.used_fallback is True
+    assert result.attempts == 2
+    assert result.validation.passed is True
+

@@ -56,9 +56,20 @@ def _tokenize(text: str) -> set[str]:
     return {w for w in text.lower().split() if len(w) > 1}
 
 
+_STOP_WORDS = {
+    "policy", "policies", "california", "kansas", "ca", "ka", "rule", "rules",
+    "regulation", "regulations", "law", "laws", "clause", "clauses", "for",
+    "the", "in", "and", "or", "to", "of", "a", "an", "is", "on", "at", "by",
+    "with", "about", "approval", "standard", "guideline", "guidelines", "please",
+    "search", "lookup", "find",
+}
+
+
 def keyword_score(query: str, clause_text: str) -> float:
-    """Recall-oriented keyword overlap: fraction of query words found in clause."""
-    q_tokens = _tokenize(query)
+    """Recall-oriented keyword overlap: fraction of non-stop query words found in clause."""
+    raw_q = _tokenize(query)
+    filtered_q = {w for w in raw_q if w not in _STOP_WORDS}
+    q_tokens = filtered_q if filtered_q else raw_q
     c_tokens = _tokenize(clause_text)
     if not q_tokens or not c_tokens:
         return 0.0
@@ -102,7 +113,7 @@ def search(
     if not scored:
         # Keyword fallback
         for clause in clauses:
-            score = keyword_score(query, f"{clause.title} {clause.text}")
+            score = keyword_score(query, f"{clause.id} {clause.title} {clause.text}")
             scored.append((clause, score))
 
     scored.sort(key=lambda x: x[1], reverse=True)
