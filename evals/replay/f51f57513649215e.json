@@ -1,0 +1,17 @@
+{
+  "text": "",
+  "tool_calls": [
+    {
+      "id": "fc_80841b9d-be90-4fc9-bcce-162a4108622b",
+      "name": "search_policy",
+      "arguments": {
+        "jurisdiction": "CA",
+        "query": "punch sequence IN OUT requirement",
+        "top_k": 3
+      }
+    }
+  ],
+  "input_tokens": 1660,
+  "output_tokens": 702,
+  "latency_ms": 1844
+}

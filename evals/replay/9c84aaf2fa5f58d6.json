@@ -1,0 +1,7 @@
+{
+  "text": "{\"exception_id\": \"exc_tc_g_132_SCHEDULE_LEAVE_CONFLICT_2026-11-03\", \"action\": \"ESCALATE_TO_HR\", \"changes\": [], \"rationale\": \"The employee's timecard shows a full shift worked on 2026-11-03 (punches p_g_132_1 to p_g_132_4) that exactly matches the scheduled shift (s_g_132). However, a sick leave (l_g_132) was approved for the entire day (2026-11-03 00:00 to 2026-11-04 00:00). According to policy KA-LEAVE-01, hours may not be recorded as worked during approved leave and such conflicts must be escalated for review.\", \"evidence\": [{\"kind\": \"shift\", \"id\": \"s_g_132\"}, {\"kind\": \"punch\", \"id\": \"p_g_132_1\"}, {\"kind\": \"punch\", \"id\": \"p_g_132_2\"}, {\"kind\": \"punch\", \"id\": \"p_g_132_3\"}, {\"kind\": \"punch\", \"id\": \"p_g_132_4\"}, {\"kind\": \"leave\", \"id\": \"l_g_132\"}], \"policy_clauses\": [\"KA-LEAVE-01\"], \"confidence\": 0.97, \"needs_employee_confirmation\": false}",
+  "tool_calls": [],
+  "input_tokens": 2426,
+  "output_tokens": 212,
+  "latency_ms": 1671
+}

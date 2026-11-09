@@ -1,0 +1,17 @@
+{
+  "text": "",
+  "tool_calls": [
+    {
+      "id": "fc_439c7342-fa41-4bed-b53e-38c07f3eb531",
+      "name": "search_policy",
+      "arguments": {
+        "jurisdiction": "CA",
+        "query": "overtime risk after 8 hours daily",
+        "top_k": 5
+      }
+    }
+  ],
+  "input_tokens": 1615,
+  "output_tokens": 223,
+  "latency_ms": 948
+}

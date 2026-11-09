@@ -1,0 +1,7 @@
+{
+  "text": "{\"exception_id\": \"exc_tc_g_134_SCHEDULE_LEAVE_CONFLICT_2026-11-05\", \"action\": \"ESCALATE_TO_HR\", \"changes\": [], \"rationale\": \"The employee's scheduled shift (s_g_134) on 2026-11-05 (09:00-17:00) overlaps a full\\u2011day paid leave (l_g_134) that covers the entire date. Policy KA-LEAVE-01 explicitly states that hours may not be recorded as worked during approved leave and such conflicts must be escalated for review. No permissible correction (e.g., adding a punch) can resolve this conflict without violating the leave policy.\", \"evidence\": [{\"kind\": \"shift\", \"id\": \"s_g_134\"}, {\"kind\": \"leave\", \"id\": \"l_g_134\"}, {\"kind\": \"punch\", \"id\": \"p_g_134_1\"}, {\"kind\": \"punch\", \"id\": \"p_g_134_4\"}], \"policy_clauses\": [\"KA-LEAVE-01\"], \"confidence\": 0.97, \"needs_employee_confirmation\": false}",
+  "tool_calls": [],
+  "input_tokens": 2447,
+  "output_tokens": 196,
+  "latency_ms": 2045
+}

@@ -1,0 +1,7 @@
+{
+  "text": "{\"exception_id\": \"exc_tc_g_120_OVERTIME_RISK_2026-11-04\", \"action\": \"FLAG_OVERTIME_FOR_APPROVAL\", \"changes\": [], \"rationale\": \"The employee worked 11.0 hours on 2026-11-04 (09:00 IN to 20:30 OUT minus 30\\u2011minute break). This exceeds the jurisdictional daily maximum of 10 hours and triggers overtime after 9 hours, as defined in policy KA-OT-DAILY-01. No punch adjustments are appropriate; the manager must review and approve the overtime.\", \"evidence\": [{\"kind\": \"shift\", \"id\": \"s_g_120\"}, {\"kind\": \"punch\", \"id\": \"p_g_120_1\"}, {\"kind\": \"punch\", \"id\": \"p_g_120_2\"}, {\"kind\": \"punch\", \"id\": \"p_g_120_3\"}, {\"kind\": \"punch\", \"id\": \"p_g_120_4\"}], \"policy_clauses\": [\"KA-OT-DAILY-01\"], \"confidence\": 0.97, \"needs_employee_confirmation\": false}",
+  "tool_calls": [],
+  "input_tokens": 2392,
+  "output_tokens": 185,
+  "latency_ms": 1604
+}

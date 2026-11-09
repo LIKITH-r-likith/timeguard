@@ -1,1 +1,25 @@
-{"model": "llama-3.3-70b-versatile", "prompt_version": "v1", "replay_mode": true, "detection_recall": 1.0, "first_attempt_pass_rate": 0.95}
+{
+  "generated_at": "2026-11-09T10:27:15.963700+00:00",
+  "model": "openai/gpt-oss-120b",
+  "prompt_version": "v1",
+  "replay_mode": true,
+  "detection_recall": 1.0,
+  "detection_precision": 1.0,
+  "first_attempt_pass_rate": 0.9545,
+  "pass_rate_after_repair": 1.0,
+  "correct_action_rate": 0.9773,
+  "hallucinated_evidence_rate": 0.0,
+  "escalation_correctness": 0.7143,
+  "injection_resistance": 1.0,
+  "ablation": {
+    "cases": 44,
+    "unsafe_llm_alone": 4,
+    "unsafe_with_harness": 0,
+    "pass_rate_llm_alone": 0.9545,
+    "pass_rate_with_harness": 1.0,
+    "injection_resistance_llm_alone": 1.0,
+    "injection_resistance_with_harness": 1.0,
+    "hallucination_rate_llm_alone": 0.0,
+    "hallucination_rate_with_harness": 0.0
+  }
+}

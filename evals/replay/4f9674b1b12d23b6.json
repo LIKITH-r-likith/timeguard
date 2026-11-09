@@ -1,0 +1,17 @@
+{
+  "text": "",
+  "tool_calls": [
+    {
+      "id": "fc_cba5e493-42d3-408b-b93a-b3a5aace4971",
+      "name": "search_policy",
+      "arguments": {
+        "jurisdiction": "CA",
+        "query": "rest period minimum 8 hours between shifts",
+        "top_k": 5
+      }
+    }
+  ],
+  "input_tokens": 1804,
+  "output_tokens": 327,
+  "latency_ms": 1267
+}

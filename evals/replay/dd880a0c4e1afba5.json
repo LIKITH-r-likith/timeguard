@@ -1,0 +1,7 @@
+{
+  "text": "{\"exception_id\": \"exc_tc_a_107_MISSED_PUNCH_2026-11-03\", \"action\": \"REQUEST_EMPLOYEE_CONFIRMATION\", \"changes\": [], \"rationale\": \"The timecard contains two consecutive OUT punches (p_a_107_4 at 17:00 and p_a_107_5 at 17:05) with no intervening IN punch. This creates an invalid punch sequence where the second OUT has no preceding IN, triggering the missed punch exception. Policy CA-MISS-01 requires that punch sequence errors be resolved with employee confirmation before any correction. Therefore we must ask the employee to confirm which OUT punch is correct or whether a missing IN should be added.\", \"evidence\": [{\"kind\": \"punch\", \"id\": \"p_a_107_4\"}, {\"kind\": \"punch\", \"id\": \"p_a_107_5\"}, {\"kind\": \"shift\", \"id\": \"s_a_107\"}], \"policy_clauses\": [\"CA-MISS-01\"], \"confidence\": 0.87, \"needs_employee_confirmation\": true}",
+  "tool_calls": [],
+  "input_tokens": 2332,
+  "output_tokens": 205,
+  "latency_ms": 2237
+}

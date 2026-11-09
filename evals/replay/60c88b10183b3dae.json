@@ -1,0 +1,7 @@
+{
+  "text": "{\"exception_id\": \"exc_tc_g_116_OVERTIME_RISK_2026-11-05\", \"action\": \"FLAG_OVERTIME_FOR_APPROVAL\", \"changes\": [], \"rationale\": \"The employee worked 9.0 hours on 2026-11-05 (IN at 09:00, OUT at 18:30 with a 30\\u2011minute break). This exceeds the 8\\u2011hour daily limit defined in CA policy, triggering overtime that requires manager approval. No punch errors are evident; the overtime is legitimate and should be flagged for approval.\", \"evidence\": [{\"kind\": \"shift\", \"id\": \"s_g_116\"}, {\"kind\": \"punch\", \"id\": \"p_g_116_1\"}, {\"kind\": \"punch\", \"id\": \"p_g_116_2\"}, {\"kind\": \"punch\", \"id\": \"p_g_116_3\"}, {\"kind\": \"punch\", \"id\": \"p_g_116_4\"}], \"policy_clauses\": [\"CA-OT-DAILY-01\"], \"confidence\": 0.97, \"needs_employee_confirmation\": false}",
+  "tool_calls": [],
+  "input_tokens": 2383,
+  "output_tokens": 183,
+  "latency_ms": 1518
+}

@@ -166,13 +166,14 @@ class TestEndpoints:
 
     def test_evals_latest(self, client: TestClient, tmp_path, monkeypatch):
         # 1. 404 when report absent
+        non_existent_report = tmp_path / "does_not_exist.json"
+        monkeypatch.setenv("EVAL_REPORT_PATH", str(non_existent_report))
         resp = client.get("/evals/latest")
-        # Could be 404 if file does not exist
-        if resp.status_code == 404:
-            err = resp.json()
-            assert err["code"] == "NOT_FOUND"
+        assert resp.status_code == 404
+        err = resp.json()
+        assert err["code"] == "NOT_FOUND"
 
-        # 2. 200 when report present
+        # 2. 200 when report present in isolated tmp_path
         fake_report = {
             "model": "llama-3.3-70b-versatile",
             "prompt_version": "v1",
@@ -180,10 +181,9 @@ class TestEndpoints:
             "detection_recall": 1.0,
             "first_attempt_pass_rate": 0.95,
         }
-        reports_dir = Path(__file__).resolve().parents[3] / "evals" / "reports"
-        reports_dir.mkdir(parents=True, exist_ok=True)
-        report_file = reports_dir / "latest.json"
+        report_file = tmp_path / "latest.json"
         report_file.write_text(json.dumps(fake_report), "utf-8")
+        monkeypatch.setenv("EVAL_REPORT_PATH", str(report_file))
 
         resp2 = client.get("/evals/latest")
         assert resp2.status_code == 200

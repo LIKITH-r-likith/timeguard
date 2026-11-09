@@ -1,0 +1,17 @@
+{
+  "text": "",
+  "tool_calls": [
+    {
+      "id": "fc_0b62bffa-82b2-4a77-8da9-e67f470f8098",
+      "name": "search_policy",
+      "arguments": {
+        "jurisdiction": "KA",
+        "query": "leave conflict schedule work sick leave",
+        "top_k": 5
+      }
+    }
+  ],
+  "input_tokens": 1680,
+  "output_tokens": 207,
+  "latency_ms": 1471
+}

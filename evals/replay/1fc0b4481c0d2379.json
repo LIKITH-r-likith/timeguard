@@ -1,0 +1,17 @@
+{
+  "text": "",
+  "tool_calls": [
+    {
+      "id": "fc_152caac5-1047-49c9-a294-ec613d3186c2",
+      "name": "search_policy",
+      "arguments": {
+        "jurisdiction": "CA",
+        "query": "missed punch add punch policy",
+        "top_k": 5
+      }
+    }
+  ],
+  "input_tokens": 1568,
+  "output_tokens": 183,
+  "latency_ms": 952
+}

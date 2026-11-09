@@ -1,0 +1,17 @@
+{
+  "text": "",
+  "tool_calls": [
+    {
+      "id": "fc_e3df19fc-26ed-47e2-b8a1-f2849fe38f6f",
+      "name": "search_policy",
+      "arguments": {
+        "jurisdiction": "CA",
+        "query": "working on paid leave overlap shift",
+        "top_k": 5
+      }
+    }
+  ],
+  "input_tokens": 1680,
+  "output_tokens": 222,
+  "latency_ms": 1836
+}

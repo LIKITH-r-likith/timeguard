@@ -1,0 +1,7 @@
+{
+  "text": "{\n  \"exception_id\": \"exc_tc_a_105_MISSED_PUNCH_2026-11-03\",\n  \"action\": \"ESCALATE_TO_HR\",\n  \"changes\": [],\n  \"rationale\": \"The timecard period is locked, preventing any modifications such as adding a missing clock-out punch. According to policy CA-MISS-01, a missed punch can be corrected by adding a punch, but this requires an editable period and employee confirmation. Since the period is locked, the issue must be escalated to HR for appropriate handling.\",\n  \"evidence\": [\n    { \"kind\": \"punch\", \"id\": \"p_a_105_1\" },\n    { \"kind\": \"shift\", \"id\": \"s_a_105\" }\n  ],\n  \"policy_clauses\": [\"CA-MISS-01\"],\n  \"confidence\": 0.95,\n  \"needs_employee_confirmation\": false\n}",
+  "tool_calls": [],
+  "input_tokens": 2102,
+  "output_tokens": 390,
+  "latency_ms": 1611
+}

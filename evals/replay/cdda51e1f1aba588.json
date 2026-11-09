@@ -1,0 +1,17 @@
+{
+  "text": "",
+  "tool_calls": [
+    {
+      "id": "fc_253ea4b8-b50a-4607-9502-3d286c5242d4",
+      "name": "search_policy",
+      "arguments": {
+        "jurisdiction": "CA",
+        "query": "meal break 30 minutes",
+        "top_k": 5
+      }
+    }
+  ],
+  "input_tokens": 1624,
+  "output_tokens": 240,
+  "latency_ms": 2052
+}

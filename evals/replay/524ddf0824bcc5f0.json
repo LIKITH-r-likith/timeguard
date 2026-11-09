@@ -1,0 +1,7 @@
+{
+  "text": "{\n  \"exception_id\": \"exc_tc_g_101_MISSED_PUNCH_2026-11-02\",\n  \"action\": \"ESCALATE_TO_HR\",\n  \"changes\": [],\n  \"rationale\": \"The timecard shows a clock\u2011in punch at 09:00 on 2026-11-02 but no corresponding clock\u2011out punch. Without a verified out time, we cannot determine the employee's total worked hours or compliance with overtime and break regulations. Policy requires a valid out punch for each in punch. Since we lack sufficient evidence to infer the correct out time, the appropriate step is to escalate the exception to HR for further investigation and resolution.\",\n  \"evidence\": [],\n  \"policy_clauses\": [\"CA-MISS-01\"],\n  \"confidence\": 0.92,\n  \"needs_employee_confirmation\": false\n}",
+  "tool_calls": [],
+  "input_tokens": 1047,
+  "output_tokens": 535,
+  "latency_ms": 1649
+}

@@ -1,0 +1,17 @@
+{
+  "text": "",
+  "tool_calls": [
+    {
+      "id": "fc_26623d9d-4ea3-4fac-a0a6-d0891f37cac0",
+      "name": "search_policy",
+      "arguments": {
+        "jurisdiction": "CA",
+        "query": "unpaid leave work conflict",
+        "top_k": 5
+      }
+    }
+  ],
+  "input_tokens": 1682,
+  "output_tokens": 347,
+  "latency_ms": 1268
+}

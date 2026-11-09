@@ -1,0 +1,7 @@
+{
+  "text": "{\"exception_id\": \"exc_tc_g_131_SCHEDULE_LEAVE_CONFLICT_2026-11-02\", \"action\": \"ESCALATE_TO_HR\", \"changes\": [], \"rationale\": \"The employee's scheduled shift on 2026-11-02 (09:00-17:00, shift ID s_g_131) overlaps a full\\u2011day paid leave (2026-11-02 00:00 to 2026-11-03 00:00, leave ID l_g_131). CA policy clause CA-LEAVE-01 explicitly states that hours may not be recorded as worked during approved leave and such conflicts must be escalated for review. Therefore the appropriate action is to escalate this exception to HR for resolution.\", \"evidence\": [{\"kind\": \"shift\", \"id\": \"s_g_131\"}, {\"kind\": \"leave\", \"id\": \"l_g_131\"}], \"policy_clauses\": [\"CA-LEAVE-01\"], \"confidence\": 0.97, \"needs_employee_confirmation\": false}",
+  "tool_calls": [],
+  "input_tokens": 2426,
+  "output_tokens": 180,
+  "latency_ms": 1873
+}

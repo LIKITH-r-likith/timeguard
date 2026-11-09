@@ -1,0 +1,15 @@
+{
+  "text": "",
+  "tool_calls": [
+    {
+      "id": "fc_6293589e-0488-4fe2-9e91-ecf5c6740875",
+      "name": "get_timecard",
+      "arguments": {
+        "timecard_id": "tc_g_119"
+      }
+    }
+  ],
+  "input_tokens": 1267,
+  "output_tokens": 145,
+  "latency_ms": 1289
+}

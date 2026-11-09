@@ -1,0 +1,7 @@
+{
+  "text": "{\n  \"exception_id\": \"exc_tc_g_127_REST_PERIOD_BREACH_2026-11-04\",\n  \"action\": \"ESCALATE_TO_HR\",\n  \"changes\": [],\n  \"rationale\": \"The employee's prior shift (shift s_g_127) ended at 2026-11-03T23:00:00+05:30. The next recorded clock\u2011in punch (p_g_127_5) occurred at 2026-11-04T05:00:00+05:30, providing only 6.0 hours of rest. California policy clause CA-REST-01 requires a minimum of 8 hours of rest between shifts. Because the recorded rest period violates this mandatory requirement, the appropriate response is to escalate the case to HR for further review and possible corrective action.\",\n  \"evidence\": [\n    { \"kind\": \"shift\", \"id\": \"s_g_127\" },\n    { \"kind\": \"punch\", \"id\": \"p_g_127_5\" }\n  ],\n  \"policy_clauses\": [\"CA-REST-01\"],\n  \"confidence\": 0.97,\n  \"needs_employee_confirmation\": false\n}",
+  "tool_calls": [],
+  "input_tokens": 2151,
+  "output_tokens": 863,
+  "latency_ms": 3018
+}

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import time
 import uuid
 from contextlib import asynccontextmanager
@@ -957,11 +958,12 @@ def get_metrics(db: Session = Depends(get_db)):
     summary="Latest eval report",
 )
 def get_latest_eval():
-    report_path = Path(__file__).resolve().parents[2] / "evals" / "reports" / "latest.json"
+    env_path = os.getenv("EVAL_REPORT_PATH")
+    report_path = Path(env_path) if env_path else Path(__file__).resolve().parents[2] / "evals" / "reports" / "latest.json"
     if not report_path.exists():
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail={"code": "NOT_FOUND", "message": "No eval report found in evals/reports/latest.json", "details": {}},
+            detail={"code": "NOT_FOUND", "message": f"No eval report found in {report_path}", "details": {}},
         )
 
     try:

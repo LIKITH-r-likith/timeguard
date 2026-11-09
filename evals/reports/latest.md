@@ -1,9 +1,9 @@
 # TimeGuard Evaluation & Ablation Report
 
-- **Generated At**: `2026-11-09T10:09:16.275127+00:00`
+- **Generated At**: `2026-11-09T10:27:15.963700+00:00`
 - **Model**: `openai/gpt-oss-120b`
 - **Prompt Version**: `v1`
-- **Mode**: `live`
+- **Mode**: `replay`
 - **Evaluated Exceptions**: `44`
 
 ## Detection Performance (Rules Engine)

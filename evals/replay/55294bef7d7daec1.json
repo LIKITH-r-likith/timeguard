@@ -1,0 +1,7 @@
+{
+  "text": "{\"exception_id\": \"exc_tc_a_103_OVERTIME_RISK_2026-11-03\", \"action\": \"FLAG_OVERTIME_FOR_APPROVAL\", \"changes\": [], \"rationale\": \"The employee worked 11.0 hours on 2026-11-03 (09:00 IN to 20:30 OUT with a 30\\u2011minute break), exceeding the 8\\u2011hour daily limit. According to CA policy clause CA-OT-DAILY-01, any hours beyond 8 in a workday are overtime and must be approved by a manager. No punches are missing or incorrect, so the appropriate response is to flag the overtime for managerial approval.\", \"evidence\": [{\"kind\": \"shift\", \"id\": \"s_a_103\"}, {\"kind\": \"punch\", \"id\": \"p_a_103_1\"}, {\"kind\": \"punch\", \"id\": \"p_a_103_2\"}, {\"kind\": \"punch\", \"id\": \"p_a_103_3\"}, {\"kind\": \"punch\", \"id\": \"p_a_103_4\"}], \"policy_clauses\": [\"CA-OT-DAILY-01\"], \"confidence\": 0.96, \"needs_employee_confirmation\": false}",
+  "tool_calls": [],
+  "input_tokens": 2412,
+  "output_tokens": 200,
+  "latency_ms": 1632
+}

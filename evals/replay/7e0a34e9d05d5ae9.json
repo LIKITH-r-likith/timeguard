@@ -1,0 +1,7 @@
+{
+  "text": "{\n  \"exception_id\": \"exc_tc_g_105_MISSED_PUNCH_2026-11-06\",\n  \"action\": \"ADD_PUNCH\",\n  \"changes\": [\n    {\n      \"op\": \"add_punch\",\n      \"type\": \"OUT\",\n      \"at\": \"2026-11-06T17:00:00+05:30\",\n      \"punch_id\": null,\n      \"break_start\": null,\n      \"break_end\": null\n    }\n  ],\n  \"rationale\": \"The employee clocked in at the scheduled start (09:00) and recorded the required 30\u2011minute meal break, but no clock\u2011out punch was recorded. The scheduled shift ends at 17:00. According to CA policy clause CA-MISS-01, a missing clock\u2011out may be corrected by adding a punch at the scheduled shift end, subject to employee confirmation.\",\n  \"evidence\": [\n    { \"kind\": \"shift\", \"id\": \"s_g_105\" },\n    { \"kind\": \"punch\", \"id\": \"p_g_105_1\" },\n    { \"kind\": \"punch\", \"id\": \"p_g_105_2\" },\n    { \"kind\": \"punch\", \"id\": \"p_g_105_3\" }\n  ],\n  \"policy_clauses\": [\"CA-MISS-01\"],\n  \"confidence\": 0.96,\n  \"needs_employee_confirmation\": true\n}",
+  "tool_calls": [],
+  "input_tokens": 1932,
+  "output_tokens": 506,
+  "latency_ms": 1649
+}

@@ -1,0 +1,7 @@
+{
+  "text": "{\"exception_id\": \"exc_tc_g_102_MISSED_PUNCH_2026-11-03\", \"action\": \"ESCALATE_TO_HR\", \"changes\": [], \"rationale\": \"Unable to retrieve required timecard, schedule, leave, history, or policy data to determine the correct missing punch time. Escalating to HR for manual review and resolution.\", \"evidence\": [], \"policy_clauses\": [], \"confidence\": 1.0, \"needs_employee_confirmation\": false}",
+  "tool_calls": [],
+  "input_tokens": 2203,
+  "output_tokens": 96,
+  "latency_ms": 798
+}

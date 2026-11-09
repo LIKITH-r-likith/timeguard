@@ -1,0 +1,17 @@
+{
+  "text": "",
+  "tool_calls": [
+    {
+      "id": "fc_33c47e27-a642-4524-b9af-321db3218a6e",
+      "name": "search_policy",
+      "arguments": {
+        "jurisdiction": "KA",
+        "query": "daily overtime maximum 10 hours",
+        "top_k": 5
+      }
+    }
+  ],
+  "input_tokens": 1625,
+  "output_tokens": 242,
+  "latency_ms": 918
+}

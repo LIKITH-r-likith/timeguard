@@ -1,0 +1,7 @@
+{
+  "text": "{\"exception_id\": \"exc_tc_g_130_REST_PERIOD_BREACH_2026-11-04\", \"action\": \"ESCALATE_TO_HR\", \"changes\": [], \"rationale\": \"The employee's prior shift ended at 2026-11-03T23:00:00+05:30 (punch p_g_130_4 / shift s_g_130) and the next recorded IN punch is at 2026-11-04T07:00:00+05:30 (punch p_g_130_5), providing only 8 hours of rest. KA jurisdiction policy clause KA-REST-01 requires a minimum of 11 hours rest between shifts. This constitutes a clear rest\\u2011period breach, so the case must be escalated to HR for further review.\", \"evidence\": [{\"kind\": \"punch\", \"id\": \"p_g_130_4\"}, {\"kind\": \"punch\", \"id\": \"p_g_130_5\"}, {\"kind\": \"shift\", \"id\": \"s_g_130\"}], \"policy_clauses\": [\"KA-REST-01\"], \"confidence\": 0.97, \"needs_employee_confirmation\": false}",
+  "tool_calls": [],
+  "input_tokens": 2631,
+  "output_tokens": 187,
+  "latency_ms": 2351
+}

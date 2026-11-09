@@ -1,0 +1,17 @@
+{
+  "text": "",
+  "tool_calls": [
+    {
+      "id": "fc_aa86d49b-bf0d-4779-979c-d1b861aee282",
+      "name": "get_schedule",
+      "arguments": {
+        "employee_id": "e111",
+        "end_date": "2026-11-04",
+        "start_date": "2026-11-04"
+      }
+    }
+  ],
+  "input_tokens": 1256,
+  "output_tokens": 128,
+  "latency_ms": 856
+}

@@ -1,0 +1,16 @@
+{
+  "text": "",
+  "tool_calls": [
+    {
+      "id": "fc_d66acba9-579b-402b-a516-2ef01b076fbf",
+      "name": "search_policy",
+      "arguments": {
+        "jurisdiction": "KA",
+        "query": "missed punch add punch policy"
+      }
+    }
+  ],
+  "input_tokens": 1568,
+  "output_tokens": 162,
+  "latency_ms": 752
+}

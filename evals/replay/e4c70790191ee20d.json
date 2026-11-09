@@ -1,0 +1,7 @@
+{
+  "text": "{\n  \"exception_id\": \"exc_tc_g_128_REST_PERIOD_BREACH_2026-11-04\",\n  \"action\": \"ESCALATE_TO_HR\",\n  \"changes\": [],\n  \"rationale\": \"The employee had only 5.0 hours of rest between the end of the shift on 2026-11-03 (punch OUT at 2026-11-03T23:00:00+05:30) and the start of the next shift on 2026-11-04 (punch IN at 2026-11-04T04:00:00+05:30). KA policy clause KA-REST-01 requires a minimum of 11 hours rest between shifts, so this is a clear rest\u2011period breach. No corrective punch or schedule adjustment can resolve the policy violation, therefore the case must be escalated to HR for review.\",\n  \"evidence\": [\n    { \"kind\": \"punch\", \"id\": \"p_g_128_4\" },\n    { \"kind\": \"punch\", \"id\": \"p_g_128_5\" },\n    { \"kind\": \"shift\", \"id\": \"s_g_128\" }\n  ],\n  \"policy_clauses\": [\"KA-REST-01\"],\n  \"confidence\": 0.97,\n  \"needs_employee_confirmation\": false\n}",
+  "tool_calls": [],
+  "input_tokens": 2150,
+  "output_tokens": 841,
+  "latency_ms": 2948
+}

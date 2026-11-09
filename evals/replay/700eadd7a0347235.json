@@ -1,0 +1,7 @@
+{
+  "text": "{\n  \"exception_id\": \"exc_tc_e02_OVERTIME_RISK_2026-11-04\",\n  \"action\": \"ESCALATE_TO_HR\",\n  \"changes\": [],\n  \"rationale\": \"Insufficient data retrieved to determine the cause of the overtime risk. No punch, shift, leave, or history records were accessed, and no applicable policy clause could be verified. Escalating to HR for further investigation.\",\n  \"evidence\": [],\n  \"policy_clauses\": [],\n  \"confidence\": 0.85,\n  \"needs_employee_confirmation\": false\n}",
+  "tool_calls": [],
+  "input_tokens": 1046,
+  "output_tokens": 396,
+  "latency_ms": 1254
+}

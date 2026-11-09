@@ -1,0 +1,7 @@
+{
+  "text": "{\"exception_id\": \"exc_tc_g_124_MEAL_BREAK_VIOLATION_2026-11-05\", \"action\": \"INSERT_BREAK\", \"changes\": [{\"op\": \"insert_break\", \"type\": \"BREAK_START\", \"break_start\": \"2026-11-05T13:00:00+05:30\", \"break_end\": \"2026-11-05T13:30:00+05:30\"}], \"rationale\": \"The shift on 2026-11-05 (09:00-17:00) has no recorded meal break. KA jurisdiction requires a minimum 30\\u2011minute rest interval after 5 hours of continuous work (policy KA-MEAL-01). Inserting a 30\\u2011minute break from 13:00 to 13:30 satisfies the requirement and aligns with the scheduled shift.\", \"evidence\": [{\"kind\": \"shift\", \"id\": \"s_g_124\"}, {\"kind\": \"punch\", \"id\": \"p_g_124_1\"}, {\"kind\": \"punch\", \"id\": \"p_g_124_2\"}], \"policy_clauses\": [\"KA-MEAL-01\"], \"confidence\": 0.95, \"needs_employee_confirmation\": false}",
+  "tool_calls": [],
+  "input_tokens": 2351,
+  "output_tokens": 192,
+  "latency_ms": 3328
+}

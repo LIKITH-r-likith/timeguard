@@ -1,0 +1,17 @@
+{
+  "text": "",
+  "tool_calls": [
+    {
+      "id": "fc_4282384e-e121-4d3d-ad53-7bd08dfebdf5",
+      "name": "search_policy",
+      "arguments": {
+        "jurisdiction": "KA",
+        "query": "overtime after 9 hours daily limit",
+        "top_k": 5
+      }
+    }
+  ],
+  "input_tokens": 1615,
+  "output_tokens": 214,
+  "latency_ms": 1074
+}

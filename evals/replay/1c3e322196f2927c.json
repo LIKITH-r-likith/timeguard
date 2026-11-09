@@ -1,0 +1,17 @@
+{
+  "text": "",
+  "tool_calls": [
+    {
+      "id": "fc_ca43ae0a-2e46-4bb7-aaf6-9ead336587f7",
+      "name": "search_policy",
+      "arguments": {
+        "jurisdiction": "KA",
+        "query": "rest period minimum 11 hours",
+        "top_k": 5
+      }
+    }
+  ],
+  "input_tokens": 1260,
+  "output_tokens": 190,
+  "latency_ms": 1478
+}

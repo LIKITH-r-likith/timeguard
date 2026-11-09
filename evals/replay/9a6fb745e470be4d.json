@@ -1,0 +1,17 @@
+{
+  "text": "",
+  "tool_calls": [
+    {
+      "id": "fc_3db9cfda-68be-4044-a458-00443f0cc91a",
+      "name": "search_policy",
+      "arguments": {
+        "jurisdiction": "KA",
+        "query": "leave overlap work shift paid leave conflict",
+        "top_k": 5
+      }
+    }
+  ],
+  "input_tokens": 1680,
+  "output_tokens": 185,
+  "latency_ms": 851
+}

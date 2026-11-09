@@ -1,0 +1,7 @@
+{
+  "text": "{\n  \"exception_id\": \"exc_tc_e01_MISSED_PUNCH_2026-11-03\",\n  \"action\": \"ESCALATE_TO_HR\",\n  \"changes\": [],\n  \"rationale\": \"The timecard shows a clock\u2011in at 09:00 on 2026\u201111\u201103 with no corresponding clock\u2011out. Without access to the employee's shift schedule, punch history, or relevant policy clauses, I cannot determine the correct out time or verify if an exception (e.g., approved leave, break, or system error) applies. Therefore, the appropriate step is to escalate this case to HR for further investigation and resolution.\",\n  \"evidence\": [],\n  \"policy_clauses\": [],\n  \"confidence\": 0.95,\n  \"needs_employee_confirmation\": false\n}",
+  "tool_calls": [],
+  "input_tokens": 1045,
+  "output_tokens": 340,
+  "latency_ms": 1276
+}

@@ -1,0 +1,17 @@
+{
+  "text": "",
+  "tool_calls": [
+    {
+      "id": "fc_a54dda00-76d3-40b4-8893-982218f41078",
+      "name": "search_policy",
+      "arguments": {
+        "jurisdiction": "CA",
+        "query": "overtime after 8 hours daily limit",
+        "top_k": 5
+      }
+    }
+  ],
+  "input_tokens": 1615,
+  "output_tokens": 214,
+  "latency_ms": 1130
+}

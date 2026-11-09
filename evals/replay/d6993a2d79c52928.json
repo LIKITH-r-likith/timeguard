@@ -1,0 +1,17 @@
+{
+  "text": "",
+  "tool_calls": [
+    {
+      "id": "fc_b69a12e3-4f9f-4e21-b034-6ef400ca963e",
+      "name": "search_policy",
+      "arguments": {
+        "jurisdiction": "CA",
+        "query": "rest period 8 hours",
+        "top_k": 5
+      }
+    }
+  ],
+  "input_tokens": 1804,
+  "output_tokens": 216,
+  "latency_ms": 869
+}
