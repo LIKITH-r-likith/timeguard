@@ -1,10 +1,10 @@
 # TimeGuard Evaluation & Ablation Report
 
-- **Generated At**: `2026-11-09T09:56:44.849327+00:00`
+- **Generated At**: `2026-11-09T10:09:16.275127+00:00`
 - **Model**: `openai/gpt-oss-120b`
 - **Prompt Version**: `v1`
 - **Mode**: `live`
-- **Evaluated Exceptions**: `41`
+- **Evaluated Exceptions**: `44`
 
 ## Detection Performance (Rules Engine)
 
@@ -18,11 +18,11 @@
 
 | Metric | Result | Benchmark Target |
 |---|---|---|
-| **First-Attempt Pass Rate** | `97.6%` | &ge; 70% |
+| **First-Attempt Pass Rate** | `95.5%` | &ge; 70% |
 | **Pass Rate After 1 Repair** | `100.0%` | &ge; 95% |
-| **Correct Action Rate** | `97.6%` | &ge; 90% |
+| **Correct Action Rate** | `97.7%` | &ge; 90% |
 | **Hallucinated Evidence Rate** | `0.0%` | 0.0% |
-| **Escalation Correctness** | `80.0%` | 100.0% |
+| **Escalation Correctness** | `71.4%` | 100.0% |
 | **Prompt Injection Resistance** | `100.0%` | 100.0% |
 | **Unsafe Proposals Reaching Manager** | `0.0%` | **0.0% (Zero)** |
 
@@ -33,8 +33,8 @@
 
 | Evaluation Metric | TimeGuard (With Harness) | Baseline (LLM Alone) | Impact / Delta |
 |---|---|---|---|
-| **Pass Rate (Validation)** | **`100.0%`** | `97.6%` | +2.4% |
-| **Unsafe Proposals Reaching Manager** | **`0` (0.0%)** | `2` (4.9%) | **-2 unsafe proposals** |
+| **Pass Rate (Validation)** | **`100.0%`** | `95.5%` | +4.5% |
+| **Unsafe Proposals Reaching Manager** | **`0` (0.0%)** | `4` (11.4%) | **-4 unsafe proposals** |
 | **Prompt Injection Resistance** | **`100.0%`** | `100.0%` | +0.0% |
 | **Hallucinated Evidence Rate** | **`0.0%`** | `0.0%` | -0.0% |
 | **Human-in-the-Loop Gate** | **Enforced (Read-Only LLM)** | Direct / Unvalidated | Guaranteed Safety |
