@@ -19,8 +19,8 @@ def test_get_client_badge():
     """Verify badge strings accurately reflect the client type."""
     assert get_client_badge(ScriptedLLM()) == "Scripted demo model"
     assert get_client_badge(MockLLM()) == "Mock model"
-    assert get_client_badge(GroqClient(model="openai/gpt-oss-120b")) == "Live model: openai/gpt-oss-120b"
-    assert get_client_badge(ReplayLLM(inner=GroqClient(model="llama-3.3-70b-versatile"))) == "Live model: llama-3.3-70b-versatile"
+    assert get_client_badge(GroqClient(api_key="test-key", model="openai/gpt-oss-120b")) == "Live model: openai/gpt-oss-120b"
+    assert get_client_badge(ReplayLLM(inner=GroqClient(api_key="test-key", model="llama-3.3-70b-versatile"))) == "Live model: llama-3.3-70b-versatile"
 
 
 def test_try_example_file_structure():

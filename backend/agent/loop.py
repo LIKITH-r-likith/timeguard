@@ -10,6 +10,7 @@ This is the heart of the agent. It:
 
 from __future__ import annotations
 
+import os
 import json
 import time
 from dataclasses import dataclass
