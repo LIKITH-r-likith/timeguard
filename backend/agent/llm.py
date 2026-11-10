@@ -374,13 +374,23 @@ class ReplayLLM:
                         record the result for future replays.
     """
 
-    def __init__(self, inner: LLMClient | None = None, replay_dir: Path | None = None) -> None:
+    def __init__(
+        self,
+        inner: LLMClient | None = None,
+        replay_dir: Path | None = None,
+        allow_network: bool | None = None,
+    ) -> None:
         self.inner = inner
         self.dir = replay_dir or REPLAY_DIR
         self.dir.mkdir(parents=True, exist_ok=True)
         self.last_cache_hit = False
         self.cache_hits = 0
         self.cache_misses = 0
+        env_mode = os.environ.get("LLM_MODE", "replay").lower()
+        if allow_network is not None:
+            self.allow_network = allow_network
+        else:
+            self.allow_network = inner is not None and env_mode != "replay"
 
     def _path(self, key: str) -> Path:
         return self.dir / f"{key}.json"
@@ -397,12 +407,9 @@ class ReplayLLM:
         self.last_cache_hit = False
         self.cache_misses += 1
 
-        mode = os.environ.get("LLM_MODE", "replay")
-        if mode == "replay":
-            raise FileNotFoundError(f"Replay cache miss: {key} (set LLM_MODE=live to record)")
+        if not self.allow_network or self.inner is None:
+            raise FileNotFoundError(f"Replay cache miss: {key} (replay mode cannot reach network)")
 
-        if self.inner is None:
-            raise ValueError("ReplayLLM in live mode needs an inner LLMClient")
         resp = self.inner.complete(messages, tools)
         data = {
             "text": resp.text,

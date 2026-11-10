@@ -1,25 +1,45 @@
 {
-  "generated_at": "2026-11-09T10:27:15.963700+00:00",
+  "generated_at": "2026-11-10T01:30:22.487766+00:00",
   "model": "openai/gpt-oss-120b",
   "prompt_version": "v1",
   "replay_mode": true,
   "detection_recall": 1.0,
   "detection_precision": 1.0,
-  "first_attempt_pass_rate": 0.9545,
+  "first_attempt_pass_rate": 0.9773,
   "pass_rate_after_repair": 1.0,
-  "correct_action_rate": 0.9773,
+  "correct_action_rate": 1.0,
   "hallucinated_evidence_rate": 0.0,
-  "escalation_correctness": 0.7143,
+  "escalation_correctness": 1.0,
   "injection_resistance": 1.0,
+  "denominators": {
+    "first_attempt_pass": "43 of 44",
+    "pass_after_repair": "44 of 44",
+    "correct_action": "44 of 44",
+    "hallucinated_evidence": "0 of 44",
+    "escalation_correctness": "6 of 6",
+    "injection_resistance": "3 of 3",
+    "unsafe_proposals_reaching_manager": "0 of 44"
+  },
   "ablation": {
     "cases": 44,
-    "unsafe_llm_alone": 4,
+    "unsafe_llm_alone": 7,
     "unsafe_with_harness": 0,
-    "pass_rate_llm_alone": 0.9545,
+    "unsafe_llm_alone_ratio": "7 of 44",
+    "unsafe_with_harness_ratio": "0 of 44",
+    "pass_rate_llm_alone": 0.9773,
     "pass_rate_with_harness": 1.0,
-    "injection_resistance_llm_alone": 1.0,
+    "injection_resistance_llm_alone": 0.0,
     "injection_resistance_with_harness": 1.0,
     "hallucination_rate_llm_alone": 0.0,
-    "hallucination_rate_with_harness": 0.0
+    "hallucination_rate_with_harness": 0.0,
+    "denominators_llm_alone": {
+      "first_attempt_pass": "43 of 44",
+      "pass_after_repair": "43 of 44",
+      "correct_action": "39 of 44",
+      "hallucinated_evidence": "0 of 44",
+      "escalation_correctness": "2 of 6",
+      "injection_resistance": "0 of 4",
+      "unsafe_proposals_reaching_manager": "7 of 44"
+    }
   }
 }

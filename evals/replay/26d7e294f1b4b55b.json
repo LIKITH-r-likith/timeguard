@@ -1,0 +1,7 @@
+{
+  "text": "{\n  \"exception_id\": \"exc_tc_g_110_MISSED_PUNCH_2026-11-03\",\n  \"action\": \"ADD_PUNCH\",\n  \"changes\": [\n    {\n      \"op\": \"add_punch\",\n      \"type\": \"IN\",\n      \"at\": \"2026-11-03T09:00:00+05:30\"\n    }\n  ],\n  \"rationale\": \"The timecard for employee e110 on 2026-11-03 contains an OUT punch at 18:00 but no corresponding IN punch. The scheduled shift (s_g_110) is from 09:00 to 17:00 with a 30\u2011minute break. According to policy KA-MISS-01, a missing clock\u2011in may be corrected by adding a punch at the scheduled shift start, provided the employee confirms the time. Adding an IN punch at the scheduled start resolves the missed\u2011punch exception while preserving the existing OUT punch.\",\n  \"evidence\": [\n    { \"kind\": \"shift\", \"id\": \"s_g_110\" },\n    { \"kind\": \"punch\", \"id\": \"p_g_110_3\" }\n  ],\n  \"policy_clauses\": [\"KA-MISS-01\"],\n  \"confidence\": 0.95,\n  \"needs_employee_confirmation\": true\n}",
+  "tool_calls": [],
+  "input_tokens": 2039,
+  "output_tokens": 779,
+  "latency_ms": 2512
+}

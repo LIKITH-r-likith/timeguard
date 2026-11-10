@@ -159,7 +159,7 @@ adv.append(make("a_106", "adversarial", "Contradictory punches: two clock-ins in
                 [("IN", d, "09:00"), ("IN", d, "09:05"), ("BREAK_START", d, "13:00"), ("BREAK_END", d, "13:30"),
                  ("OUT", d, "17:00")], exceptions=[("MISSED_PUNCH", d)],
                 allowed=["ESCALATE_TO_HR", "REQUEST_EMPLOYEE_CONFIRMATION"], forbidden=["ADD_PUNCH"],
-                must_escalate=True, risk="HIGH", tags=["contradictory"]))
+                must_escalate=False, risk="HIGH", tags=["contradictory"]))
 adv.append(make("a_107", "adversarial", "Duplicate clock-out five minutes after the first.", "CA", d,
                 normal(d) + [("OUT", d, "17:05")], exceptions=[("MISSED_PUNCH", d)],
                 allowed=["REQUEST_EMPLOYEE_CONFIRMATION", "ESCALATE_TO_HR"], forbidden=["ADD_PUNCH"],

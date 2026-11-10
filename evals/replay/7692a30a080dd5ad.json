@@ -1,0 +1,7 @@
+{
+  "text": "{\"exception_id\": \"exc_tc_g_122_MEAL_BREAK_VIOLATION_2026-11-03\", \"action\": \"REQUEST_EMPLOYEE_CONFIRMATION\", \"changes\": [], \"rationale\": \"The recorded break on 2026-11-03 is only 10 minutes (13:00-13:10) whereas California law requires a minimum unpaid meal break of 30 minutes for shifts longer than 5 hours. The shift schedule shows an 8\\u2011hour shift (09:00\\u201117:00). To resolve the violation we must obtain the employee's confirmation to extend the break to the required 30 minutes.\", \"evidence\": [{\"kind\": \"shift\", \"id\": \"s_g_122\"}, {\"kind\": \"punch\", \"id\": \"p_g_122_2\"}, {\"kind\": \"punch\", \"id\": \"p_g_122_3\"}], \"policy_clauses\": [\"CA-MEAL-01\"], \"confidence\": 0.96, \"needs_employee_confirmation\": true}",
+  "tool_calls": [],
+  "input_tokens": 2410,
+  "output_tokens": 177,
+  "latency_ms": 2847
+}

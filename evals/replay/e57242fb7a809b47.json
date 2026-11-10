@@ -1,0 +1,7 @@
+{
+  "text": "{\"exception_id\": \"exc_tc_g_117_OVERTIME_RISK_2026-11-06\", \"action\": \"FLAG_OVERTIME_FOR_APPROVAL\", \"changes\": [], \"rationale\": \"The employee worked 10.5 hours on 2026-11-06 (09:00 IN to 20:00 OUT, minus 30\\u202fmin break). Policy KA-OT-DAILY-01 states that any hours beyond 9 in a workday are overtime and require manager approval, and a workday may not exceed 10 hours. Since the worked time exceeds the 10\\u2011hour daily maximum, this is an overtime risk that must be flagged for manager approval.\", \"evidence\": [{\"kind\": \"shift\", \"id\": \"s_g_117\"}, {\"kind\": \"punch\", \"id\": \"p_g_117_1\"}, {\"kind\": \"punch\", \"id\": \"p_g_117_2\"}, {\"kind\": \"punch\", \"id\": \"p_g_117_3\"}, {\"kind\": \"punch\", \"id\": \"p_g_117_4\"}], \"policy_clauses\": [\"KA-OT-DAILY-01\"], \"confidence\": 0.96, \"needs_employee_confirmation\": false}",
+  "tool_calls": [],
+  "input_tokens": 2391,
+  "output_tokens": 199,
+  "latency_ms": 2153
+}

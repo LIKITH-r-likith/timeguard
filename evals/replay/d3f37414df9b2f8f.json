@@ -1,0 +1,7 @@
+{
+  "text": "{\n  \"exception_id\": \"exc_tc_g_121_MEAL_BREAK_VIOLATION_2026-11-02\",\n  \"action\": \"INSERT_BREAK\",\n  \"changes\": [\n    {\n      \"op\": \"insert_break\",\n      \"break_start\": \"2026-11-02T12:00:00+05:30\",\n      \"break_end\": \"2026-11-02T12:30:00+05:30\"\n    }\n  ],\n  \"rationale\": \"The employee's shift on 2026-11-02 is 8 hours (09:00-17:00) and the policy requires a minimum 30\u2011minute unpaid meal break for shifts longer than 5 hours. No break punches are recorded, resulting in a meal break violation. Inserting a 30\u2011minute break at a typical mid\u2011shift time resolves the violation while preserving the recorded work hours.\",\n  \"evidence\": [\n    { \"kind\": \"shift\", \"id\": \"s_g_121\" },\n    { \"kind\": \"punch\", \"id\": \"p_g_121_1\" },\n    { \"kind\": \"punch\", \"id\": \"p_g_121_2\" }\n  ],\n  \"policy_clauses\": [\"CA-MEAL-01\"],\n  \"confidence\": 0.95,\n  \"needs_employee_confirmation\": true\n}",
+  "tool_calls": [],
+  "input_tokens": 1894,
+  "output_tokens": 743,
+  "latency_ms": 2564
+}

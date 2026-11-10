@@ -1,0 +1,7 @@
+{
+  "text": "{\n  \"exception_id\": \"exc_tc_g_125_MEAL_BREAK_VIOLATION_2026-11-06\",\n  \"action\": \"INSERT_BREAK\",\n  \"changes\": [\n    {\n      \"op\": \"insert_break\",\n      \"break_start\": \"2026-11-06T12:15:00+05:30\",\n      \"break_end\": \"2026-11-06T12:30:00+05:30\"\n    }\n  ],\n  \"rationale\": \"The shift on 2026-11-06 is 8 hours long. Policy KA-MEAL-01 requires a minimum 30\u2011minute meal break after 5 hours of work. The recorded break was only 15 minutes (12:00\u201312:15). Inserting an additional 15\u2011minute break from 12:15 to 12:30 brings the total break time to the required 30 minutes, resolving the violation.\",\n  \"evidence\": [\n    { \"kind\": \"shift\", \"id\": \"s_g_125\" },\n    { \"kind\": \"punch\", \"id\": \"p_g_125_2\" },\n    { \"kind\": \"punch\", \"id\": \"p_g_125_3\" }\n  ],\n  \"policy_clauses\": [\"KA-MEAL-01\"],\n  \"confidence\": 0.95,\n  \"needs_employee_confirmation\": true\n}",
+  "tool_calls": [],
+  "input_tokens": 2167,
+  "output_tokens": 907,
+  "latency_ms": 2723
+}

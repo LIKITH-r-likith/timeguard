@@ -1,0 +1,7 @@
+{
+  "text": "{\"exception_id\": \"exc_tc_g_111_MISSED_PUNCH_2026-11-04\", \"action\": \"ADD_PUNCH\", \"changes\": [{\"op\": \"add_punch\", \"type\": \"IN\", \"at\": \"2026-11-04T09:00:00+05:30\"}], \"rationale\": \"The timecard for employee e111 on 2026-11-04 contains a clock\\u2011out punch at 16:30 but no preceding clock\\u2011in. The scheduled shift (s_g_111) is 09:00\\u201317:00 with a 30\\u2011minute break. According to policy clause CA-MISS-01, a missing clock\\u2011in may be corrected by adding a punch at the scheduled shift start, provided the employee confirms the time. Adding an IN punch at 09:00 aligns with the scheduled start and falls within the permissible correction window.\", \"evidence\": [{\"kind\": \"shift\", \"id\": \"s_g_111\"}, {\"kind\": \"punch\", \"id\": \"p_g_111_3\"}, {\"kind\": \"punch\", \"id\": \"p_g_111_1\"}, {\"kind\": \"punch\", \"id\": \"p_g_111_2\"}], \"policy_clauses\": [\"CA-MISS-01\"], \"confidence\": 0.96, \"needs_employee_confirmation\": true}",
+  "tool_calls": [],
+  "input_tokens": 2512,
+  "output_tokens": 227,
+  "latency_ms": 2657
+}

@@ -750,6 +750,12 @@ def reject_proposal(
             detail={"code": "FORBIDDEN", "message": "Only MANAGER or HR can reject proposals", "details": {}},
         )
 
+    if prop.status in ("APPROVED", "REJECTED"):
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail={"code": "CONFLICT", "message": f"Proposal is already {prop.status}", "details": {}},
+        )
+
     exc = db.execute(select(ExceptionModel).where(ExceptionModel.id == prop.exception_id)).scalar_one()
 
     now_iso = datetime.now(timezone.utc).isoformat()

@@ -1,0 +1,7 @@
+{
+  "text": "{\n  \"exception_id\": \"exc_tc_a_106_MISSED_PUNCH_2026-11-03\",\n  \"action\": \"REQUEST_EMPLOYEE_CONFIRMATION\",\n  \"changes\": [],\n  \"rationale\": \"The timecard shows a scheduled shift from 09:00 to 17:00 (shift s_a_106). Punches include two clock\u2011ins (09:00 and 09:05) and a clock\u2011out at 17:00 (p_a_106_5). The system flagged a missed punch (no clock\u2011out) despite an OUT record, likely due to the duplicate IN causing a mismatch. Policy CA-MISS-01 requires employee confirmation before correcting a missed punch. Therefore, we request the employee to confirm the correct clock\u2011out time and clarify the duplicate IN.\",\n  \"evidence\": [\n    { \"kind\": \"shift\", \"id\": \"s_a_106\" },\n    { \"kind\": \"punch\", \"id\": \"p_a_106_1\" },\n    { \"kind\": \"punch\", \"id\": \"p_a_106_2\" },\n    { \"kind\": \"punch\", \"id\": \"p_a_106_5\" }\n  ],\n  \"policy_clauses\": [\"CA-MISS-01\"],\n  \"confidence\": 0.85,\n  \"needs_employee_confirmation\": true\n}",
+  "tool_calls": [],
+  "input_tokens": 2022,
+  "output_tokens": 1156,
+  "latency_ms": 3041
+}

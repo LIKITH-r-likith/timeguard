@@ -1,0 +1,7 @@
+{
+  "text": "{\"exception_id\": \"exc_tc_g_102_MISSED_PUNCH_2026-11-03\", \"action\": \"ADD_PUNCH\", \"changes\": [{\"op\": \"add_punch\", \"type\": \"OUT\", \"at\": \"2026-11-03T16:30:00+05:30\", \"punch_id\": null, \"break_start\": null, \"break_end\": null}], \"rationale\": \"The employee clocked in at the scheduled start (08:30) and recorded the required break, but no clock\\u2011out punch was recorded. The scheduled shift ends at 16:30. Policy KA-MISS-01 permits adding a missing punch at the scheduled shift boundary, provided the employee confirms the time. Adding an OUT punch at 16:30 aligns with the shift schedule and satisfies the missed punch exception.\", \"evidence\": [{\"kind\": \"shift\", \"id\": \"s_g_102\"}, {\"kind\": \"punch\", \"id\": \"p_g_102_1\"}, {\"kind\": \"punch\", \"id\": \"p_g_102_2\"}, {\"kind\": \"punch\", \"id\": \"p_g_102_3\"}], \"policy_clauses\": [\"KA-MISS-01\"], \"confidence\": 0.96, \"needs_employee_confirmation\": true}",
+  "tool_calls": [],
+  "input_tokens": 2270,
+  "output_tokens": 220,
+  "latency_ms": 1732
+}

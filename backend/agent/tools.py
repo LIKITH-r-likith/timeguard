@@ -33,6 +33,7 @@ def _serialize(obj: Any) -> Any:
 
 
 def get_timecard(ctx: ContextProvider, timecard_id: str) -> dict:
+    """Retrieve timecard details with employee notes safely delimited in XML tags."""
     tc = ctx.get_timecard(timecard_id)
     data = tc.model_dump(mode="json")
     data["notes"] = _wrap_notes(tc.notes)
@@ -40,6 +41,7 @@ def get_timecard(ctx: ContextProvider, timecard_id: str) -> dict:
 
 
 def get_schedule(ctx: ContextProvider, employee_id: str, start_date: str, end_date: str) -> list[dict]:
+    """Retrieve scheduled shifts for an employee over a date range."""
     start = date.fromisoformat(start_date)
     end = date.fromisoformat(end_date)
     shifts = ctx.get_schedule(employee_id, start, end)
@@ -47,6 +49,7 @@ def get_schedule(ctx: ContextProvider, employee_id: str, start_date: str, end_da
 
 
 def get_leave(ctx: ContextProvider, employee_id: str, start_date: str, end_date: str) -> list[dict]:
+    """Retrieve approved leave periods for an employee over a date range."""
     start = date.fromisoformat(start_date)
     end = date.fromisoformat(end_date)
     leaves = ctx.get_leave(employee_id, start, end)
@@ -54,6 +57,7 @@ def get_leave(ctx: ContextProvider, employee_id: str, start_date: str, end_date:
 
 
 def get_history(ctx: ContextProvider, employee_id: str, weeks: int = 4) -> list[dict]:
+    """Retrieve historical punch records for an employee over the requested weeks."""
     punches = ctx.get_history(employee_id, weeks)
     return _serialize(punches)
 

@@ -679,3 +679,12 @@ def test_resolve_repair_after_bad_json_then_connection_error() -> None:
     assert result.attempts == 2
     assert result.validation.passed is True
 
+
+def test_simulate_runner(capsys) -> None:
+    """Verify offline simulation runner executes without crashing."""
+    from backend.agent.simulate import run_simulation
+    run_simulation()
+    captured = capsys.readouterr()
+    assert "TimeGuard Offline Agent Simulation" in captured.out
+    assert "Simulation Summary:" in captured.out
+

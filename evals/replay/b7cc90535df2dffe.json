@@ -1,0 +1,7 @@
+{
+  "text": "{\n  \"exception_id\": \"exc_tc_g_102_MISSED_PUNCH_2026-11-03\",\n  \"action\": \"REQUEST_EMPLOYEE_CONFIRMATION\",\n  \"changes\": [],\n  \"rationale\": \"The timecard shows a clock\u2011in punch at 08:30 on 2026-11-03 but no corresponding clock\u2011out punch. Without the scheduled shift end or a recorded out punch, we cannot determine the correct end time. Company policy for missed punches (KA-MISSED-PUNCH-01) requires confirmation from the employee before adding or adjusting a punch when the appropriate out time is unclear.\",\n  \"evidence\": [],\n  \"policy_clauses\": [\"KA-MISSED-PUNCH-01\"],\n  \"confidence\": 0.45,\n  \"needs_employee_confirmation\": true\n}",
+  "tool_calls": [],
+  "input_tokens": 1047,
+  "output_tokens": 609,
+  "latency_ms": 1825
+}

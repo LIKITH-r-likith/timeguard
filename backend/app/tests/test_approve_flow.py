@@ -117,3 +117,73 @@ def test_employee_confirmation_workflow(client: TestClient, monkeypatch):
     appr_ok = client.post(f"/proposals/{prop_id}/approve", headers={"X-Role": "HR"})
     assert appr_ok.status_code == 200
     assert appr_ok.json()["status"] == "APPROVED"
+
+
+def test_double_approve_returns_conflict(client: TestClient):
+    """Attempting to approve an already approved proposal must return 409 CONFLICT."""
+    client.post(
+        "/scan",
+        headers={"X-Role": "MANAGER"},
+        json={"period_start": "2026-11-02", "period_end": "2026-11-08"},
+    )
+    list_resp = client.get("/exceptions", headers={"X-Role": "MANAGER"}).json()
+    exc = list_resp[0]
+    prop = client.post(f"/exceptions/{exc['id']}/resolve", headers={"X-Role": "MANAGER"}).json()
+    prop_id = prop["id"]
+
+    # First approval
+    appr1 = client.post(f"/proposals/{prop_id}/approve", headers={"X-Role": "HR"})
+    assert appr1.status_code == 200
+    assert appr1.json()["status"] == "APPROVED"
+
+    # Second approval (double-approve) -> 409
+    appr2 = client.post(f"/proposals/{prop_id}/approve", headers={"X-Role": "HR"})
+    assert appr2.status_code == 409
+    assert appr2.json()["code"] == "CONFLICT"
+    assert "already APPROVED" in appr2.json()["message"]
+
+
+def test_approve_after_reject_returns_conflict(client: TestClient):
+    """Attempting to approve a rejected proposal must return 409 CONFLICT."""
+    client.post(
+        "/scan",
+        headers={"X-Role": "MANAGER"},
+        json={"period_start": "2026-11-02", "period_end": "2026-11-08"},
+    )
+    list_resp = client.get("/exceptions", headers={"X-Role": "MANAGER"}).json()
+    exc = list_resp[0]
+    prop = client.post(f"/exceptions/{exc['id']}/resolve", headers={"X-Role": "MANAGER"}).json()
+    prop_id = prop["id"]
+
+    # Reject
+    rej = client.post(f"/proposals/{prop_id}/reject", headers={"X-Role": "HR"})
+    assert rej.status_code == 200
+    assert rej.json()["status"] == "REJECTED"
+
+    # Approve after reject -> 409
+    appr = client.post(f"/proposals/{prop_id}/approve", headers={"X-Role": "HR"})
+    assert appr.status_code == 409
+    assert appr.json()["code"] == "CONFLICT"
+    assert "already REJECTED" in appr.json()["message"]
+
+
+def test_reject_after_approve_returns_conflict(client: TestClient):
+    """Attempting to reject an approved proposal must return 409 CONFLICT."""
+    client.post(
+        "/scan",
+        headers={"X-Role": "MANAGER"},
+        json={"period_start": "2026-11-02", "period_end": "2026-11-08"},
+    )
+    list_resp = client.get("/exceptions", headers={"X-Role": "MANAGER"}).json()
+    exc = list_resp[0]
+    prop = client.post(f"/exceptions/{exc['id']}/resolve", headers={"X-Role": "MANAGER"}).json()
+    prop_id = prop["id"]
+
+    # Approve
+    appr = client.post(f"/proposals/{prop_id}/approve", headers={"X-Role": "HR"})
+    assert appr.status_code == 200
+
+    # Reject after approve -> 409
+    rej = client.post(f"/proposals/{prop_id}/reject", headers={"X-Role": "HR"})
+    assert rej.status_code == 409
+    assert rej.json()["code"] == "CONFLICT"

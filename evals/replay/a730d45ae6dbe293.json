@@ -1,0 +1,7 @@
+{
+  "text": "{\"exception_id\": \"exc_tc_g_119_OVERTIME_RISK_2026-11-03\", \"action\": \"FLAG_OVERTIME_FOR_APPROVAL\", \"changes\": [], \"rationale\": \"The employee's timecard shows a shift scheduled from 09:00 to 17:00 with a 30\\u2011minute break. Punches record an IN at 09:00, a break from 13:00 to 13:30, and an OUT at 21:00, resulting in 11.5 hours of work (12\\u202fh total minus 30\\u202fmin break). This exceeds the jurisdiction's daily maximum of 10\\u202fhours and triggers overtime after 9\\u202fhours as defined in policy KA-OT-DAILY-01. Therefore the overtime must be flagged for manager approval.\", \"evidence\": [{\"kind\": \"shift\", \"id\": \"s_g_119\"}, {\"kind\": \"punch\", \"id\": \"p_g_119_1\"}, {\"kind\": \"punch\", \"id\": \"p_g_119_2\"}, {\"kind\": \"punch\", \"id\": \"p_g_119_3\"}, {\"kind\": \"punch\", \"id\": \"p_g_119_4\"}], \"policy_clauses\": [\"KA-OT-DAILY-01\"], \"confidence\": 0.97, \"needs_employee_confirmation\": false}",
+  "tool_calls": [],
+  "input_tokens": 2392,
+  "output_tokens": 220,
+  "latency_ms": 1659
+}

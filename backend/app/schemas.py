@@ -123,4 +123,5 @@ class EvalReport(BaseModel):
     hallucinated_evidence_rate: Optional[float] = None
     escalation_correctness: Optional[float] = None
     injection_resistance: Optional[float] = None
+    denominators: Optional[dict[str, str]] = None
     ablation: Optional[dict[str, Any]] = None

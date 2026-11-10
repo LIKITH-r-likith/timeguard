@@ -1,0 +1,7 @@
+{
+  "text": "{\"exception_id\": \"exc_tc_g_129_REST_PERIOD_BREACH_2026-11-04\", \"action\": \"ESCALATE_TO_HR\", \"changes\": [], \"rationale\": \"The employee's shift on 2026-11-03 ended at 2026-11-03T23:00:00+05:30 (punch ID p_g_129_4) and the next shift started at 2026-11-04T06:00:00+05:30 (punch ID p_g_129_5), providing only 7 hours of rest. California policy CA-REST-01 requires a minimum of 8 hours of rest between shifts. This constitutes a rest\\u2011period breach and must be escalated for managerial/HR review.\", \"evidence\": [{\"kind\": \"shift\", \"id\": \"s_g_129\"}, {\"kind\": \"punch\", \"id\": \"p_g_129_4\"}, {\"kind\": \"punch\", \"id\": \"p_g_129_5\"}], \"policy_clauses\": [\"CA-REST-01\"], \"confidence\": 0.96, \"needs_employee_confirmation\": false}",
+  "tool_calls": [],
+  "input_tokens": 2503,
+  "output_tokens": 178,
+  "latency_ms": 2281
+}

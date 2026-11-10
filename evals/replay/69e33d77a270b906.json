@@ -1,0 +1,7 @@
+{
+  "text": "{\"exception_id\": \"exc_tc_g_101_MISSED_PUNCH_2026-11-02\", \"action\": \"ADD_PUNCH\", \"changes\": [{\"op\": \"add_punch\", \"type\": \"OUT\", \"at\": \"2026-11-02T17:00:00+05:30\", \"punch_id\": null, \"break_start\": null, \"break_end\": null}], \"rationale\": \"The employee's scheduled shift on 2026-11-02 runs from 09:00 to 17:00 (shift ID s_g_101). The timecard contains an IN punch at 09:00 and break punches, but no OUT punch. According to CA policy clause CA-MISS-01, a missing clock-out may be corrected by adding a punch at the scheduled shift end, provided the employee confirms the time. Adding an OUT punch at 17:00 aligns with the scheduled shift and satisfies the policy.\", \"evidence\": [{\"kind\": \"shift\", \"id\": \"s_g_101\"}, {\"kind\": \"punch\", \"id\": \"p_g_101_1\"}], \"policy_clauses\": [\"CA-MISS-01\"], \"confidence\": 0.96, \"needs_employee_confirmation\": true}",
+  "tool_calls": [],
+  "input_tokens": 2379,
+  "output_tokens": 209,
+  "latency_ms": 1737
+}

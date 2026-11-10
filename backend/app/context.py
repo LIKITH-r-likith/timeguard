@@ -37,6 +37,7 @@ class DbContextProvider:
         self.session = session
 
     def get_exception(self, exception_id: str) -> ExceptionRecord:
+        """Fetch an exception record by ID from the database."""
         stmt = select(ExceptionModel).where(ExceptionModel.id == exception_id)
         row = self.session.execute(stmt).scalar_one_or_none()
         if row is None:
@@ -54,6 +55,7 @@ class DbContextProvider:
         )
 
     def get_timecard(self, timecard_id: str) -> Timecard:
+        """Fetch and reconstruct a full Timecard domain model by ID."""
         stmt = select(TimecardModel).where(TimecardModel.id == timecard_id)
         row = self.session.execute(stmt).scalar_one_or_none()
         if row is None:
@@ -105,6 +107,7 @@ class DbContextProvider:
         )
 
     def get_schedule(self, employee_id: str, start: date, end: date) -> list[Shift]:
+        """Fetch scheduled shifts for an employee within a date window."""
         stmt = select(ShiftModel).where(ShiftModel.employee_id == employee_id)
         rows = self.session.execute(stmt).scalars().all()
         result = []
@@ -124,6 +127,7 @@ class DbContextProvider:
         return result
 
     def get_leave(self, employee_id: str, start: date, end: date) -> list[Leave]:
+        """Fetch approved leave periods for an employee within a date window."""
         stmt = select(LeaveModel).where(LeaveModel.employee_id == employee_id)
         rows = self.session.execute(stmt).scalars().all()
         result = []
@@ -143,6 +147,7 @@ class DbContextProvider:
         return result
 
     def get_history(self, employee_id: str, weeks: int = 4) -> list[Punch]:
+        """Fetch historical punches for an employee spanning recent weeks."""
         stmt = select(PunchModel).where(PunchModel.employee_id == employee_id)
         rows = self.session.execute(stmt).scalars().all()
         return [
@@ -156,4 +161,5 @@ class DbContextProvider:
         ]
 
     def get_policy_pack(self, jurisdiction: str) -> Optional[PolicyPack]:
+        """Load the policy pack corresponding to the requested jurisdiction."""
         return load_policy(jurisdiction)

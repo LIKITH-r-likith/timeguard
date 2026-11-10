@@ -214,6 +214,20 @@ def resolve_loop(
             trace_id=trace.trace_id,
         )
 
+    # 2b. Deterministic rule: locked pay period -> force ESCALATE_TO_HR
+    if timecard.locked:
+        trace.add("locked_period", {"timecard_id": timecard.id, "reason": "Pay period is locked."})
+        proposal = _escalate_proposal(exc, "Pay period is locked; timecards cannot be changed. Escalating to HR.")
+        vr = validate(proposal, timecard, policy, exception=exc)
+        store_trace(trace)
+        return ResolutionResult(
+            proposal=proposal,
+            validation=vr,
+            attempts=1,
+            used_fallback=False,
+            trace_id=trace.trace_id,
+        )
+
     # 3. Build the system message
     system_msg = _build_system_message(exc, timecard)
     messages: list[dict] = [{"role": "system", "content": system_msg}]
@@ -254,6 +268,9 @@ def resolve_loop(
         trace.add("attempt_1", {"error": str(llm_err1), "proposal": None})
 
     if proposal is not None:
+        if proposal.rationale and safety.is_rationale_injection(proposal.rationale):
+            trace.add("safety_flag", {"rationale_hit": proposal.rationale})
+            proposal = _escalate_proposal(exc, "Safety: injection pattern detected in proposal rationale.")
         vr = validate(proposal, timecard, policy, exception=exc)
         trace.add("validation", {
             "attempt": 1,
@@ -319,6 +336,9 @@ def resolve_loop(
         proposal2 = _parse_proposal(resp2.text)
 
     if proposal2 is not None:
+        if proposal2.rationale and safety.is_rationale_injection(proposal2.rationale):
+            trace.add("safety_flag", {"rationale_hit": proposal2.rationale})
+            proposal2 = _escalate_proposal(exc, "Safety: injection pattern detected in repair rationale.")
         vr2 = validate(proposal2, timecard, policy, exception=exc)
         trace.add("validation", {
             "attempt": 2,

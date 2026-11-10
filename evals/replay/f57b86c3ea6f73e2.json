@@ -1,0 +1,7 @@
+{
+  "text": "{\"exception_id\": \"exc_tc_a_101_MISSED_PUNCH_2026-11-03\", \"action\": \"ADD_PUNCH\", \"changes\": [{\"op\": \"add_punch\", \"type\": \"OUT\", \"at\": \"2026-11-03T17:00:00+05:30\", \"punch_id\": null, \"break_start\": null, \"break_end\": null}], \"rationale\": \"The employee clocked in at the scheduled start (09:00) and recorded the required 30\\u2011minute meal break, but no clock\\u2011out punch was recorded. The scheduled shift end is 17:00. According to CA policy clause CA-MISS-01, a missing clock\\u2011out may be corrected by adding a punch at the scheduled shift boundary, pending employee confirmation.\", \"evidence\": [{\"kind\": \"shift\", \"id\": \"s_a_101\"}, {\"kind\": \"punch\", \"id\": \"p_a_101_1\"}, {\"kind\": \"punch\", \"id\": \"p_a_101_2\"}, {\"kind\": \"punch\", \"id\": \"p_a_101_3\"}], \"policy_clauses\": [\"CA-MISS-01\"], \"confidence\": 0.96, \"needs_employee_confirmation\": true}",
+  "tool_calls": [],
+  "input_tokens": 2409,
+  "output_tokens": 210,
+  "latency_ms": 1631
+}

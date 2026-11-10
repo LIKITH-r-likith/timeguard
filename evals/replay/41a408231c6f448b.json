@@ -1,0 +1,17 @@
+{
+  "text": "",
+  "tool_calls": [
+    {
+      "id": "fc_5e43f768-956e-4993-8006-42bbda7cb73c",
+      "name": "search_policy",
+      "arguments": {
+        "jurisdiction": "KA",
+        "query": "missed punch add out",
+        "top_k": 5
+      }
+    }
+  ],
+  "input_tokens": 1600,
+  "output_tokens": 198,
+  "latency_ms": 1520
+}

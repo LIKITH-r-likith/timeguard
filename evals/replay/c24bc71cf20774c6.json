@@ -1,0 +1,7 @@
+{
+  "text": "{\n  \"exception_id\": \"exc_tc_g_108_MISSED_PUNCH_2026-11-04\",\n  \"action\": \"ADD_PUNCH\",\n  \"changes\": [\n    {\n      \"op\": \"add_punch\",\n      \"type\": \"OUT\",\n      \"at\": \"2026-11-04T18:30:00+05:30\",\n      \"punch_id\": null,\n      \"break_start\": null,\n      \"break_end\": null\n    }\n  ],\n  \"rationale\": \"The employee clocked in at the scheduled start (10:30) and recorded break punches, but no clock\u2011out punch exists for the shift that ends at 18:30. The scheduled shift (s_g_108) defines the expected end time. According to policy KA-MISS-01, a missing clock\u2011out may be corrected by adding a punch at the scheduled shift boundary, provided the employee confirms the time.\",\n  \"evidence\": [\n    { \"kind\": \"shift\", \"id\": \"s_g_108\" },\n    { \"kind\": \"punch\", \"id\": \"p_g_108_1\" },\n    { \"kind\": \"punch\", \"id\": \"p_g_108_2\" },\n    { \"kind\": \"punch\", \"id\": \"p_g_108_3\" }\n  ],\n  \"policy_clauses\": [\"KA-MISS-01\"],\n  \"confidence\": 0.96,\n  \"needs_employee_confirmation\": true\n}",
+  "tool_calls": [],
+  "input_tokens": 2042,
+  "output_tokens": 633,
+  "latency_ms": 2897
+}
