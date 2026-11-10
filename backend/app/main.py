@@ -326,6 +326,7 @@ def get_exception_detail(
             decided_by=prop_row.decided_by,
             decided_at=datetime.fromisoformat(prop_row.decided_at) if prop_row.decided_at else None,
             decision_comment=prop_row.decision_comment,
+            model=getattr(prop_row, "model", None) or "Scripted demo model",
         )
 
     return ExceptionDetail(
@@ -459,11 +460,18 @@ def resolve_exception(
     exc_row.status = exc_status.value
     exc_row.risk = computed_risk.value
 
+    trace = get_trace(res.trace_id)
+    client_model = (
+        (trace.model if trace and trace.model else None)
+        or ("Scripted demo model" if os.environ.get("LLM_MODE", "").lower() == "demo" else f"Live model: {os.environ.get('LLM_MODEL', 'openai/gpt-oss-120b')}")
+    )
+
     prop_id = existing.id if existing else f"prop_{uuid.uuid4().hex[:8]}"
     if existing:
         existing.status = prop_status
         existing.risk = computed_risk.value
         existing.resolution = res.model_dump(mode="json")
+        existing.model = client_model
     else:
         prop_row = ProposalModel(
             id=prop_id,
@@ -471,11 +479,11 @@ def resolve_exception(
             status=prop_status,
             risk=computed_risk.value,
             resolution=res.model_dump(mode="json"),
+            model=client_model,
         )
         db.add(prop_row)
 
     # Save run trace
-    trace = get_trace(res.trace_id)
     steps_data = []
     if trace:
         steps_data = [
@@ -494,6 +502,7 @@ def resolve_exception(
         trace_id=res.trace_id,
         exception_id=id,
         prompt_version="v1",
+        model=client_model,
         steps=steps_data,
         created_at=datetime.now(timezone.utc).isoformat(),
     ))
@@ -515,6 +524,7 @@ def resolve_exception(
         status=prop_status,
         risk=computed_risk,
         resolution=res,
+        model=client_model,
     )
 
 
@@ -573,6 +583,7 @@ def confirm_proposal(
         risk=RiskTier(prop.risk),
         resolution=ResolutionResult.model_validate(prop.resolution),
         confirmed_at=datetime.fromisoformat(now_iso),
+        model=getattr(prop, "model", None) or "Scripted demo model",
     )
 
 
@@ -716,6 +727,7 @@ def approve_proposal(
         decided_by=prop.decided_by,
         decided_at=datetime.fromisoformat(now_iso),
         decision_comment=comment,
+        model=getattr(prop, "model", None) or "Scripted demo model",
     )
 
 
@@ -800,6 +812,7 @@ def reject_proposal(
         decided_by=prop.decided_by,
         decided_at=datetime.fromisoformat(now_iso),
         decision_comment=comment,
+        model=getattr(prop, "model", None) or "Scripted demo model",
     )
 
 
@@ -903,6 +916,7 @@ def get_run_trace(
         trace_id=run.trace_id,
         exception_id=run.exception_id,
         prompt_version=run.prompt_version,
+        model=getattr(run, "model", None) or "Scripted demo model",
         steps=steps,
     )
 

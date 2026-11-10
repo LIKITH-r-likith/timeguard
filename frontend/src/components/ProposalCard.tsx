@@ -172,6 +172,20 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
           >
             {currentRisk} RISK
           </span>
+
+          {/* Model Badge */}
+          {proposalRecord.model && (
+            <span
+              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold border ${
+                proposalRecord.model.startsWith('Live model:')
+                  ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                  : 'bg-blue-50 text-blue-800 border-blue-300'
+              }`}
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              {proposalRecord.model}
+            </span>
+          )}
         </div>
 
         {/* Status indicator */}

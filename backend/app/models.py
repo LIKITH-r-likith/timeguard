@@ -124,6 +124,7 @@ class ProposalModel(Base):
     decided_by: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     decided_at: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     decision_comment: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    model: Mapped[Optional[str]] = mapped_column(String(128), nullable=True)
 
     exception: Mapped[ExceptionModel] = relationship("ExceptionModel", back_populates="proposals")
 
@@ -161,5 +162,6 @@ class RunModel(Base):
     trace_id: Mapped[str] = mapped_column(String(64), primary_key=True)
     exception_id: Mapped[str] = mapped_column(String(128), nullable=False)
     prompt_version: Mapped[str] = mapped_column(String(32), default="v1", nullable=False)
+    model: Mapped[Optional[str]] = mapped_column(String(128), nullable=True)
     steps: Mapped[list[dict[str, Any]]] = mapped_column(JSON, default=list, nullable=False)
     created_at: Mapped[str] = mapped_column(String(64), nullable=False)

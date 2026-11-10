@@ -55,6 +55,7 @@ class ProposalRecord(BaseModel):
     decided_by: Optional[str] = None
     decided_at: Optional[datetime] = None
     decision_comment: Optional[str] = None
+    model: Optional[str] = None
 
 
 class ExceptionDetail(BaseModel):
@@ -96,6 +97,7 @@ class RunTrace(BaseModel):
     trace_id: str
     exception_id: str
     prompt_version: Optional[str] = "v1"
+    model: Optional[str] = None
     steps: list[RunStep] = Field(default_factory=list)
 
 

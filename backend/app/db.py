@@ -5,7 +5,7 @@ from __future__ import annotations
 import os
 from typing import Generator
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
 DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///timeguard.db")
@@ -34,3 +34,14 @@ def get_db() -> Generator[Session, None, None]:
 def init_db() -> None:
     """Create all tables if they do not exist."""
     Base.metadata.create_all(bind=engine)
+    # Ensure added columns exist in existing SQLite databases
+    with engine.connect() as conn:
+        for table, col, col_type in [
+            ("runs", "model", "VARCHAR(128)"),
+            ("proposals", "model", "VARCHAR(128)"),
+        ]:
+            try:
+                conn.execute(text(f"ALTER TABLE {table} ADD COLUMN {col} {col_type}"))
+                conn.commit()
+            except Exception:
+                pass

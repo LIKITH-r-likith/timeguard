@@ -121,7 +121,12 @@ def _run_tool_loop(
             resp.input_tokens = total_input
             resp.output_tokens = total_output
             resp.latency_ms = total_latency
-            trace.add("llm_response", {"text": resp.text})
+            trace.add("llm_response", {
+                "text": resp.text,
+                "input_tokens": total_input,
+                "output_tokens": total_output,
+                "latency_ms": total_latency,
+            })
             return ToolLoopResult(response=resp, policy_not_found=policy_not_found)
 
         # Execute each tool call
@@ -185,6 +190,41 @@ def _run_tool_loop(
     return ToolLoopResult(response=resp, policy_not_found=policy_not_found)
 
 
+def get_client_badge(llm: Any) -> str:
+    """Return model badge string based on the actual LLM client used."""
+    if hasattr(llm, "model_badge") and llm.model_badge:
+        return str(llm.model_badge)
+
+    try:
+        from backend.agent.demo_script import ScriptedLLM
+        if isinstance(llm, ScriptedLLM):
+            return "Scripted demo model"
+    except ImportError:
+        pass
+
+    try:
+        from backend.agent.llm import GroqClient, MockLLM, ReplayLLM
+        if isinstance(llm, GroqClient):
+            return f"Live model: {llm.model}"
+        if isinstance(llm, ReplayLLM):
+            if llm.inner and hasattr(llm.inner, "model"):
+                return f"Live model: {llm.inner.model}"
+            if hasattr(llm, "model") and llm.model:
+                return f"Live model: {llm.model}"
+            if os.environ.get("LLM_MODE", "").lower() == "demo":
+                return "Scripted demo model"
+            return f"Live model: {os.environ.get('LLM_MODEL', 'openai/gpt-oss-120b')}"
+        if isinstance(llm, MockLLM):
+            return "Mock model"
+    except ImportError:
+        pass
+
+    if hasattr(llm, "model") and llm.model:
+        return f"Live model: {llm.model}"
+
+    return "Scripted demo model" if os.environ.get("LLM_MODE", "").lower() == "demo" else f"Live model: {os.environ.get('LLM_MODEL', 'openai/gpt-oss-120b')}"
+
+
 def resolve_loop(
     exception_id: str,
     ctx: ContextProvider,
@@ -192,7 +232,8 @@ def resolve_loop(
 ) -> ResolutionResult:
     """Main resolution loop.  Returns a ResolutionResult (always)."""
     t0 = time.monotonic()
-    trace = Trace()
+    badge = get_client_badge(llm)
+    trace = Trace(model=badge)
 
     # 1. Load exception and timecard
     exc = ctx.get_exception(exception_id)

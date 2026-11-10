@@ -12,6 +12,7 @@ import {
   Sliders,
   ShieldAlert,
   Award,
+  Sparkles,
 } from 'lucide-react';
 import type { Metrics, EvalReport, RunTrace } from '../types';
 import { api, ApiError } from '../api/client';
@@ -426,8 +427,22 @@ export const ObservabilityView: React.FC = () => {
 
         {loadedTrace && (
           <div className="bg-slate-900 rounded-xl p-4 text-slate-100 font-mono text-xs space-y-3">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-800 text-slate-400">
-              <span>Trace: {loadedTrace.trace_id}</span>
+            <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-slate-800 text-slate-400">
+              <div className="flex items-center gap-2">
+                <span>Trace: {loadedTrace.trace_id}</span>
+                {loadedTrace.model && (
+                  <span
+                    className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold ${
+                      loadedTrace.model.startsWith('Live model:')
+                        ? 'bg-emerald-950 text-emerald-300 border border-emerald-700'
+                        : 'bg-blue-950 text-blue-300 border border-blue-700'
+                    }`}
+                  >
+                    <Sparkles className="w-3 h-3" />
+                    {loadedTrace.model}
+                  </span>
+                )}
+              </div>
               <span>Exception: {loadedTrace.exception_id}</span>
             </div>
 

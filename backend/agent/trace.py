@@ -23,8 +23,9 @@ class TraceStep:
 class Trace:
     """Ordered log of everything that happened during one resolve() call."""
 
-    def __init__(self, trace_id: str | None = None) -> None:
+    def __init__(self, trace_id: str | None = None, model: str | None = None) -> None:
         self.trace_id: str = trace_id or uuid.uuid4().hex[:12]
+        self.model: str | None = model
         self.steps: list[TraceStep] = []
 
     def add(self, kind: str, data: dict[str, Any]) -> None:
