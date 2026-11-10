@@ -7,6 +7,7 @@ Fallback: keyword overlap scoring when embedding model cannot load.
 from __future__ import annotations
 
 import math
+import os
 from typing import Any, Optional
 
 from backend.core.contract import (
@@ -19,18 +20,35 @@ from backend.core.models import PolicyClause
 
 
 # ---------------------------------------------------------------------------
-# Try to load fastembed; fall back gracefully.
+# Embedding support: used ONLY when TIMEGUARD_EMBEDDINGS=1.
+# Default is the keyword retriever, in every mode (live, replay, mock, demo),
+# with no network access or model download.
 # ---------------------------------------------------------------------------
 _EMBEDDER: Any = None
 _EMBED_AVAILABLE = False
 
-try:
-    from fastembed import TextEmbedding  # type: ignore[import-untyped]
 
-    _EMBEDDER = TextEmbedding(model_name="BAAI/bge-small-en-v1.5")
-    _EMBED_AVAILABLE = True
-except Exception:
-    _EMBED_AVAILABLE = False
+def _use_embeddings() -> bool:
+    """Return True only if TIMEGUARD_EMBEDDINGS=1."""
+    return os.environ.get("TIMEGUARD_EMBEDDINGS") == "1"
+
+
+def _get_embedder() -> Any:
+    """Lazily load fastembed only if TIMEGUARD_EMBEDDINGS=1."""
+    global _EMBEDDER, _EMBED_AVAILABLE
+    if not _use_embeddings():
+        return None
+    if _EMBEDDER is not None:
+        return _EMBEDDER
+    try:
+        from fastembed import TextEmbedding  # type: ignore[import-untyped]
+
+        _EMBEDDER = TextEmbedding(model_name="BAAI/bge-small-en-v1.5")
+        _EMBED_AVAILABLE = True
+    except Exception:
+        _EMBEDDER = None
+        _EMBED_AVAILABLE = False
+    return _EMBEDDER
 
 
 def _cosine(a: list[float], b: list[float]) -> float:
@@ -43,9 +61,10 @@ def _cosine(a: list[float], b: list[float]) -> float:
 
 
 def _embed_texts(texts: list[str]) -> list[list[float]]:
-    if _EMBEDDER is None:
-        raise RuntimeError("fastembed not available")
-    return [list(v) for v in _EMBEDDER.embed(texts)]
+    embedder = _get_embedder()
+    if embedder is None:
+        raise RuntimeError("fastembed not available or TIMEGUARD_EMBEDDINGS != 1")
+    return [list(v) for v in embedder.embed(texts)]
 
 
 # ---------------------------------------------------------------------------
@@ -99,16 +118,18 @@ def search(
 
     scored: list[tuple[PolicyClause, float]] = []
 
-    if _EMBED_AVAILABLE and not force_keyword:
-        try:
-            texts = [query] + [f"{c.title}: {c.text}" for c in clauses]
-            vecs = _embed_texts(texts)
-            q_vec = vecs[0]
-            for i, clause in enumerate(clauses):
-                sim = _cosine(q_vec, vecs[i + 1])
-                scored.append((clause, sim))
-        except Exception:
-            scored = []  # fall through to keyword
+    if _use_embeddings() and not force_keyword:
+        embedder = _get_embedder()
+        if embedder is not None:
+            try:
+                texts = [query] + [f"{c.title}: {c.text}" for c in clauses]
+                vecs = _embed_texts(texts)
+                q_vec = vecs[0]
+                for i, clause in enumerate(clauses):
+                    sim = _cosine(q_vec, vecs[i + 1])
+                    scored.append((clause, sim))
+            except Exception:
+                scored = []  # fall through to keyword
 
     if not scored:
         # Keyword fallback

@@ -3,8 +3,6 @@ pyyaml>=6.0
 python-dotenv>=1.0
 pytest>=8.0
 pytest-cov>=5.0
-# fastembed: local embedding model for policy retrieval in backend/agent/retrieval.py (falls back to keyword matching if not installed)
-fastembed>=0.3.0
 # FastAPI service, ASGI server, SQLite ORM, test client / HTTP requests
 fastapi>=0.110.0
 uvicorn[standard]>=0.28.0

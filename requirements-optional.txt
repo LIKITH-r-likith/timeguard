@@ -1,0 +1,8 @@
+# Optional dependencies for TimeGuard
+# ---------------------------------------------------------------------------
+# To enable semantic embedding retrieval instead of the default deterministic
+# keyword retriever:
+#   1. pip install -r requirements-optional.txt
+#   2. export TIMEGUARD_EMBEDDINGS=1
+# ---------------------------------------------------------------------------
+fastembed>=0.3.0

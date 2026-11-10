@@ -30,6 +30,7 @@ class TestEmbeddingSearch:
                         out.append([0.0, 1.0])
                 return out
 
+        monkeypatch.setenv("TIMEGUARD_EMBEDDINGS", "1")
         monkeypatch.setattr(ret_mod, "_EMBED_AVAILABLE", True)
         monkeypatch.setattr(ret_mod, "_EMBEDDER", DummyEmbedder())
 
