@@ -1,0 +1,12 @@
+# TimeGuard root .dockerignore
+.env
+.env.*
+!.env.example
+.venv
+node_modules
+**/__pycache__
+__pycache__
+.git
+*.db
+dist
+docs/screenshots

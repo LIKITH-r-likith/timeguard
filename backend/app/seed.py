@@ -120,3 +120,9 @@ def load_seed_timecards(session: Session, cases_file: Optional[Path] = None) -> 
 def date_from_iso(d_str: str):
     from datetime import date
     return date.fromisoformat(d_str)
+
+
+if __name__ == "__main__":
+    from data.seed.seed import main
+    main()
+

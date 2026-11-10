@@ -1,54 +1,56 @@
-.PHONY: setup test seed api frontend eval demo
+.PHONY: setup test seed api frontend eval demo docker-build docker-up docker-down
 
 VENV ?= .venv
-PYTHON ?= $(VENV)/bin/python
-PIP ?= $(VENV)/bin/pip
-UVICORN ?= $(VENV)/bin/uvicorn
+PYTHON ?= $(shell if [ -x "$(VENV)/bin/python" ]; then echo "$(VENV)/bin/python"; else command -v python3 || echo "python3"; fi)
+PIP ?= $(shell if [ -x "$(VENV)/bin/pip" ]; then echo "$(VENV)/bin/pip"; else command -v pip3 || echo "pip"; fi)
 
 setup:
 	@if [ ! -d "$(VENV)" ]; then \
 		python3 -m venv $(VENV); \
 	fi
 	$(PIP) install -r requirements.txt
+	@if [ -d "frontend" ] && [ -f "frontend/package.json" ]; then \
+		cd frontend && npm install; \
+	fi
 
 test:
-	@if [ -x "$(PYTHON)" ]; then \
-		$(PYTHON) -m pytest -q; \
-	else \
-		python3 -m pytest -q; \
-	fi
+	$(PYTHON) -m pytest -q
 
 seed:
-	@if [ -f "backend/app/seed.py" ] || [ -f "data/seed/loader.py" ] || [ -f "data/seed/seed.py" ]; then \
-		$(PYTHON) -m backend.app.seed; \
-	else \
-		echo "seed: not built yet"; \
-	fi
+	$(PYTHON) -m backend.app.seed
 
 api:
-	@if [ -f "backend/app/main.py" ]; then \
-		$(UVICORN) backend.app.main:app --reload; \
-	else \
-		echo "api: not built yet"; \
-	fi
+	LLM_MODE=demo $(PYTHON) -m uvicorn backend.app.main:app --host 0.0.0.0 --port 8000 --reload
 
 frontend:
 	@if [ -d "frontend" ] && [ -f "frontend/package.json" ]; then \
 		cd frontend && npm run dev; \
 	else \
-		echo "frontend: not built yet"; \
+		echo "frontend: not found"; \
 	fi
 
 eval:
-	@if [ -f "evals/runner/run.py" ] || [ -f "evals/runner/runner.py" ]; then \
-		$(PYTHON) -m evals.runner.run; \
-	else \
-		echo "eval: not built yet"; \
-	fi
+	$(PYTHON) -m evals.runner.run_eval --mode mock
 
-demo:
-	@if [ -f "backend/app/main.py" ] && [ -d "frontend" ] && [ -f "frontend/package.json" ]; then \
-		$(MAKE) seed && ($(UVICORN) backend.app.main:app --reload & cd frontend && npm run dev); \
-	else \
-		echo "demo: not built yet"; \
-	fi
+demo: seed
+	@echo "======================================================================"
+	@echo "Starting TimeGuard Full Stack (API + Console) [Demo Mode]"
+	@echo "  API Backend:    http://localhost:8000 (API docs at /docs)"
+	@echo "  Frontend App:   http://localhost:5173"
+	@echo "Press Ctrl+C to terminate both services cleanly."
+	@echo "======================================================================"
+	@bash -c '\
+		trap "kill 0" EXIT INT TERM; \
+		(LLM_MODE=demo $(PYTHON) -m uvicorn backend.app.main:app --host 0.0.0.0 --port 8000 --reload) & \
+		(cd frontend && npm run dev) & \
+		wait'
+
+# Docker convenience targets
+docker-build:
+	docker compose build
+
+docker-up:
+	docker compose up
+
+docker-down:
+	docker compose down
