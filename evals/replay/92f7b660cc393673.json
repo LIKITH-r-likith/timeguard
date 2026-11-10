@@ -1,0 +1,7 @@
+{
+  "text": "{\n  \"exception_id\": \"exc_tc_e01_MISSED_PUNCH_2026-11-03\",\n  \"action\": \"ADD_PUNCH\",\n  \"changes\": [\n    {\n      \"op\": \"add_punch\",\n      \"type\": \"OUT\",\n      \"at\": \"2026-11-03T17:00:00+05:30\",\n      \"punch_id\": null,\n      \"break_start\": null,\n      \"break_end\": null\n    }\n  ],\n  \"rationale\": \"The employee clocked in at 09:00 on 2026-11-03 (p_88) and recorded the required meal break, but no clock\u2011out punch is present. The scheduled shift (s_12) ends at 17:00. CA policy clause CA-MISS-01 permits adding a missing punch at the scheduled shift boundary after employee confirmation. Adding an OUT punch at 17:00 aligns with the schedule and complies with the policy.\",\n  \"evidence\": [\n    { \"kind\": \"punch\", \"id\": \"p_88\" },\n    { \"kind\": \"punch\", \"id\": \"p_89\" },\n    { \"kind\": \"punch\", \"id\": \"p_90\" },\n    { \"kind\": \"shift\", \"id\": \"s_12\" }\n  ],\n  \"policy_clauses\": [\"CA-MISS-01\"],\n  \"confidence\": 0.96,\n  \"needs_employee_confirmation\": true\n}",
+  "tool_calls": [],
+  "input_tokens": 3152,
+  "output_tokens": 616,
+  "latency_ms": 2041
+}

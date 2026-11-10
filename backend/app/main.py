@@ -18,6 +18,7 @@ from dotenv import load_dotenv
 load_dotenv(override=False)
 
 from fastapi import Depends, FastAPI, Header, HTTPException, Query, Request, status
+from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -31,10 +32,13 @@ from backend.app.db import get_db, init_db
 from backend.app.models import (
     ApprovalModel,
     AuditLogModel,
+    Employee,
     ExceptionModel,
+    LeaveModel,
     PunchModel,
     ProposalModel,
     RunModel,
+    ShiftModel,
     TimecardModel,
 )
 from backend.app.schemas import (
@@ -49,6 +53,9 @@ from backend.app.schemas import (
     RunTrace,
     ScanRequest,
     ScanResponse,
+    ScenarioRequest,
+    ScenarioResponse,
+    ScenarioTimecardInput,
 )
 from backend.app.seed import load_seed_timecards
 from backend.core.api import detect, load_policy, pay_impact, risk_tier, validate
@@ -145,7 +152,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     payload = {
         "code": "VALIDATION_ERROR",
         "message": "Invalid request parameters or payload",
-        "details": {"errors": exc.errors()},
+        "details": {"errors": jsonable_encoder(exc.errors())},
     }
     return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content=payload)
 
@@ -994,3 +1001,166 @@ def get_latest_eval():
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail={"code": "INTERNAL_ERROR", "message": f"Failed to read eval report: {exc}", "details": {}},
         )
+
+
+@app.post(
+    "/sandbox/scenarios",
+    response_model=ScenarioResponse,
+    tags=["sandbox"],
+    summary="Ingest an isolated custom timecard scenario for trial",
+)
+def create_sandbox_scenario(
+    payload: ScenarioRequest,
+    auth: AuthContext = Depends(get_auth_context),
+    db: Session = Depends(get_db),
+):
+    if auth.role not in (Role.MANAGER, Role.HR):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={"code": "FORBIDDEN", "message": "Only MANAGER or HR can ingest sandbox scenarios", "details": {}},
+        )
+
+    # Extract timecard input from either payload.timecard or flat fields
+    if payload.timecard is not None:
+        tc_in = payload.timecard
+    else:
+        if not payload.jurisdiction or not payload.period_start or not payload.period_end:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail={
+                    "code": "INVALID_INPUT",
+                    "message": "Scenario requires jurisdiction, period_start, and period_end.",
+                    "details": {},
+                },
+            )
+        tc_in = ScenarioTimecardInput(
+            id=payload.case_id or f"tc_sbx_{uuid.uuid4().hex[:8]}",
+            employee_id=payload.employee_id or "e_sandbox",
+            jurisdiction=payload.jurisdiction,
+            period_start=payload.period_start,
+            period_end=payload.period_end,
+            locked=bool(payload.locked),
+            shifts=payload.shifts or [],
+            punches=payload.punches or [],
+            notes=payload.notes or [],
+            leaves=[],
+        )
+
+    emp_id = tc_in.employee_id or payload.employee_id or "e_sandbox"
+    # Ensure employee exists or create sandbox employee
+    emp = db.execute(select(Employee).where(Employee.id == emp_id)).scalar_one_or_none()
+    if not emp:
+        emp = Employee(
+            id=emp_id,
+            name=f"Sandbox User ({emp_id})",
+            email=f"{emp_id}_{uuid.uuid4().hex[:4]}@sandbox.local",
+            role=Role.EMPLOYEE.value,
+            sandbox=True,
+        )
+        db.add(emp)
+        db.flush()
+
+    tc_id = tc_in.id or payload.case_id or f"tc_sbx_{uuid.uuid4().hex[:8]}"
+    # Remove existing timecard with this id if re-running scenario
+    existing_tc = db.execute(select(TimecardModel).where(TimecardModel.id == tc_id)).scalar_one_or_none()
+    if existing_tc:
+        db.delete(existing_tc)
+        db.flush()
+
+    tc_model = TimecardModel(
+        id=tc_id,
+        employee_id=emp_id,
+        jurisdiction=tc_in.jurisdiction.strip().upper(),
+        period_start=tc_in.period_start,
+        period_end=tc_in.period_end,
+        locked=tc_in.locked,
+        notes=list(tc_in.notes or []),
+        sandbox=True,
+    )
+    db.add(tc_model)
+    db.flush()
+
+    for i, s in enumerate(tc_in.shifts):
+        shift_id = s.id or f"s_{tc_id}_{i}"
+        db_shift = ShiftModel(
+            id=shift_id,
+            timecard_id=tc_id,
+            employee_id=emp_id,
+            start=s.start.isoformat(),
+            end=s.end.isoformat(),
+            scheduled_break_minutes=s.scheduled_break_minutes,
+        )
+        db.add(db_shift)
+
+    for i, p in enumerate(tc_in.punches):
+        punch_id = p.id or f"p_{tc_id}_{i}"
+        ptype = p.type.value if hasattr(p.type, "value") else str(p.type)
+        db_punch = PunchModel(
+            id=punch_id,
+            timecard_id=tc_id,
+            employee_id=emp_id,
+            type=ptype,
+            at=p.at.isoformat(),
+        )
+        db.add(db_punch)
+
+    for i, l in enumerate(tc_in.leaves):
+        leave_id = l.id or f"l_{tc_id}_{i}"
+        db_leave = LeaveModel(
+            id=leave_id,
+            timecard_id=tc_id,
+            employee_id=emp_id,
+            start=l.start.isoformat(),
+            end=l.end.isoformat(),
+            kind=l.kind,
+        )
+        db.add(db_leave)
+    db.flush()
+
+    # Reconstruct domain timecard and detect exceptions
+    ctx = DbContextProvider(db)
+    core_timecard = ctx.get_timecard(tc_id)
+    policy = ctx.get_policy_pack(core_timecard.jurisdiction)
+    detected = detect(core_timecard, policy)
+
+    for exc in detected:
+        old_exc = db.execute(select(ExceptionModel).where(ExceptionModel.id == exc.id)).scalar_one_or_none()
+        if old_exc:
+            db.delete(old_exc)
+            db.flush()
+        db_exc = ExceptionModel(
+            id=exc.id,
+            type=exc.type.value,
+            employee_id=exc.employee_id,
+            timecard_id=exc.timecard_id,
+            work_date=exc.work_date,
+            detail=exc.detail,
+            policy_clauses=exc.policy_clauses,
+            status=ExceptionStatus.OPEN.value,
+            risk=None,
+            sandbox=True,
+        )
+        db.add(db_exc)
+
+    log_audit(
+        session=db,
+        actor=auth.actor,
+        role=auth.role.value,
+        action="SCENARIO_CREATED",
+        entity_type="timecard",
+        entity_id=tc_id,
+        payload={
+            "jurisdiction": core_timecard.jurisdiction,
+            "exceptions_detected": len(detected),
+            "exception_ids": [e.id for e in detected],
+            "sandbox": True,
+        },
+    )
+    db.commit()
+
+    return ScenarioResponse(
+        timecard_id=tc_id,
+        employee_id=emp_id,
+        exceptions_detected=len(detected),
+        exception_ids=[e.id for e in detected],
+    )

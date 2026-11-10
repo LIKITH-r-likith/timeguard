@@ -39,6 +39,9 @@ def init_db() -> None:
         for table, col, col_type in [
             ("runs", "model", "VARCHAR(128)"),
             ("proposals", "model", "VARCHAR(128)"),
+            ("employees", "sandbox", "BOOLEAN DEFAULT 0"),
+            ("timecards", "sandbox", "BOOLEAN DEFAULT 0"),
+            ("exceptions", "sandbox", "BOOLEAN DEFAULT 0"),
         ]:
             try:
                 conn.execute(text(f"ALTER TABLE {table} ADD COLUMN {col} {col_type}"))

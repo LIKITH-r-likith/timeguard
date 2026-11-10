@@ -122,4 +122,11 @@ export const api = {
 
   getLatestEval: (auth?: { role: Role; employeeId?: string }) =>
     request<EvalReport>('/evals/latest', { method: 'GET' }, auth || { role: 'MANAGER' }),
+
+  createScenario: (data: any, auth?: { role: Role; employeeId?: string }) =>
+    request<import('../types').ScenarioResponse>(
+      '/sandbox/scenarios',
+      { method: 'POST', body: JSON.stringify(data) },
+      auth || { role: 'MANAGER' }
+    ),
 };

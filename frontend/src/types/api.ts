@@ -269,6 +269,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/sandbox/scenarios": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Ingest an isolated custom timecard scenario for trial
+         * @description MANAGER or HR only. Ingests a trial timecard, runs rules engine detect(), creates isolated exception records, and records audit trail. Never calls the LLM.
+         */
+        post: operations["createSandboxScenario"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -531,6 +551,65 @@ export interface components {
             details?: {
                 [key: string]: unknown;
             };
+        };
+        ScenarioShiftInput: {
+            id?: string;
+            /** Format: date-time */
+            start: string;
+            /** Format: date-time */
+            end: string;
+            /** @default 0 */
+            scheduled_break_minutes: number;
+        };
+        ScenarioPunchInput: {
+            id?: string;
+            /** @enum {string} */
+            type: "IN" | "OUT" | "BREAK_START" | "BREAK_END";
+            /** Format: date-time */
+            at: string;
+        };
+        ScenarioTimecardInput: {
+            id?: string;
+            employee_id?: string;
+            jurisdiction: string;
+            /** Format: date */
+            period_start: string;
+            /** Format: date */
+            period_end: string;
+            /** @default false */
+            locked: boolean;
+            shifts?: components["schemas"]["ScenarioShiftInput"][];
+            punches?: components["schemas"]["ScenarioPunchInput"][];
+            notes?: string[];
+            leaves?: {
+                id?: string;
+                /** Format: date-time */
+                start?: string;
+                /** Format: date-time */
+                end?: string;
+                kind?: string;
+            }[];
+        };
+        ScenarioRequest: {
+            case_id?: string;
+            description?: string;
+            timecard?: components["schemas"]["ScenarioTimecardInput"];
+            employee_id?: string;
+            jurisdiction?: string;
+            /** Format: date */
+            period_start?: string;
+            /** Format: date */
+            period_end?: string;
+            locked?: boolean;
+            shifts?: components["schemas"]["ScenarioShiftInput"][];
+            punches?: components["schemas"]["ScenarioPunchInput"][];
+            notes?: string[];
+        };
+        ScenarioResponse: {
+            timecard_id: string;
+            employee_id: string;
+            exceptions_detected: number;
+            exception_ids: string[];
         };
     };
     responses: {
@@ -907,6 +986,35 @@ export interface operations {
                 };
             };
             404: components["responses"]["Error"];
+        };
+    };
+    createSandboxScenario: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Demo auth. Who is calling. */
+                "X-Role": components["parameters"]["Role"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ScenarioRequest"];
+            };
+        };
+        responses: {
+            /** @description Scenario ingested and exceptions detected */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScenarioResponse"];
+                };
+            };
+            400: components["responses"]["Error"];
+            403: components["responses"]["Error"];
         };
     };
 }

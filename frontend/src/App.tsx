@@ -6,6 +6,7 @@ import { ExceptionQueueView } from './views/ExceptionQueueView';
 import { EmployeeConfirmationView } from './views/EmployeeConfirmationView';
 import { AuditTrailView } from './views/AuditTrailView';
 import { ObservabilityView } from './views/ObservabilityView';
+import { TryScenarioView } from './views/TryScenarioView';
 import { api } from './api/client';
 
 const AppContent: React.FC = () => {
@@ -18,9 +19,9 @@ const AppContent: React.FC = () => {
   const { currentUser } = useAuth();
   const isManagerRole = currentUser.role === 'MANAGER' || currentUser.role === 'HR';
 
-  // Automatically switch tab away from Queue/Audit if on non-manager role
+  // Automatically switch tab away from Queue/Audit/Scenario if on non-manager role
   useEffect(() => {
-    if (!isManagerRole && (activeTab === 'exceptions' || activeTab === 'audit')) {
+    if (!isManagerRole && (activeTab === 'exceptions' || activeTab === 'audit' || activeTab === 'scenario')) {
       setActiveTab('confirmation');
     }
   }, [currentUser, isManagerRole, activeTab]);
@@ -71,6 +72,7 @@ const AppContent: React.FC = () => {
         {isManagerRole && activeTab === 'exceptions' && (
           <ExceptionQueueView initialSelectedId={initialException} />
         )}
+        {isManagerRole && activeTab === 'scenario' && <TryScenarioView />}
         {activeTab === 'confirmation' && <EmployeeConfirmationView />}
         {isManagerRole && activeTab === 'audit' && <AuditTrailView />}
         {activeTab === 'observability' && <ObservabilityView />}

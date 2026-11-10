@@ -1,8 +1,8 @@
 import React from 'react';
-import { Shield, Clock, UserCheck, Activity, Database, ChevronDown } from 'lucide-react';
+import { Shield, Clock, UserCheck, Activity, Database, ChevronDown, FlaskConical } from 'lucide-react';
 import { useAuth, DEMO_USERS } from '../context/AuthContext';
 
-export type NavTab = 'exceptions' | 'confirmation' | 'audit' | 'observability';
+export type NavTab = 'exceptions' | 'scenario' | 'confirmation' | 'audit' | 'observability';
 
 interface HeaderProps {
   activeTab: NavTab;
@@ -61,6 +61,20 @@ export const Header: React.FC<HeaderProps> = ({
                 >
                   <Clock className="w-4 h-4" />
                   Exceptions Queue
+                </button>
+              )}
+
+              {isManagerRole && (
+                <button
+                  onClick={() => onSelectTab('scenario')}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    activeTab === 'scenario'
+                      ? 'bg-slate-100 text-indigo-700'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                  }`}
+                >
+                  <FlaskConical className="w-4 h-4" />
+                  Try Your Own Scenario
                 </button>
               )}
 

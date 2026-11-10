@@ -28,6 +28,7 @@ class Employee(Base):
     email: Mapped[str] = mapped_column(String(128), nullable=False, unique=True)
     manager_id: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     role: Mapped[str] = mapped_column(String(32), default=Role.EMPLOYEE.value, nullable=False)
+    sandbox: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
 
 class TimecardModel(Base):
@@ -39,6 +40,7 @@ class TimecardModel(Base):
     period_start: Mapped[date] = mapped_column(Date, nullable=False)
     period_end: Mapped[date] = mapped_column(Date, nullable=False)
     locked: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    sandbox: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     notes: Mapped[list[str]] = mapped_column(JSON, default=list, nullable=False)
 
     punches: Mapped[list[PunchModel]] = relationship(
@@ -105,6 +107,7 @@ class ExceptionModel(Base):
     policy_clauses: Mapped[list[str]] = mapped_column(JSON, default=list, nullable=False)
     status: Mapped[str] = mapped_column(String(32), default=ExceptionStatus.OPEN.value, nullable=False)
     risk: Mapped[Optional[str]] = mapped_column(String(16), nullable=True)  # RiskTier
+    sandbox: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
     timecard: Mapped[TimecardModel] = relationship("TimecardModel", back_populates="exceptions")
     proposals: Mapped[list[ProposalModel]] = relationship(

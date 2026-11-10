@@ -197,17 +197,27 @@ class GroqClient:
         self,
         api_key: str | None = None,
         model: str | None = None,
+        base_url: str | None = None,
         timeout: int = _TIMEOUT_S,
         max_retries: int = _MAX_RETRIES,
         pacer: TokenPacer | None = None,
     ) -> None:
-        self.api_key = api_key or os.environ.get("GROQ_API_KEY", "")
+        self.api_key = api_key or os.environ.get("LLM_API_KEY") or os.environ.get("GROQ_API_KEY", "")
         self.model = model or os.environ.get("LLM_MODEL", _DEFAULT_MODEL)
+        raw_url = base_url or os.environ.get("LLM_BASE_URL") or _GROQ_URL
+        if not raw_url.endswith("/chat/completions"):
+            base = raw_url.rstrip("/")
+            if base.endswith("/v1"):
+                self.endpoint_url = f"{base}/chat/completions"
+            else:
+                self.endpoint_url = f"{base}/v1/chat/completions"
+        else:
+            self.endpoint_url = raw_url
         self.timeout = timeout
         self.max_retries = max_retries
         self.pacer = pacer or _shared_pacer
         if not self.api_key:
-            raise ValueError("GROQ_API_KEY is required for GroqClient")
+            raise ValueError("GROQ_API_KEY or LLM_API_KEY is required for GroqClient")
 
     def complete(self, messages: list[dict], tools: list[dict] | None = None) -> LLMResponse:
         body: dict = {
@@ -246,7 +256,7 @@ class GroqClient:
 
             t0 = time.monotonic()
             try:
-                req = urllib.request.Request(_GROQ_URL, data=data, headers=headers, method="POST")
+                req = urllib.request.Request(self.endpoint_url, data=data, headers=headers, method="POST")
                 with urllib.request.urlopen(req, timeout=self.timeout) as resp:
                     result = json.loads(resp.read())
                 latency = int((time.monotonic() - t0) * 1000)

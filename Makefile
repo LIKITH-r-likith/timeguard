@@ -47,9 +47,9 @@ demo: seed
 		wait'
 
 live-demo: seed
-	@if [ -z "$$GROQ_API_KEY" ] && ! grep -q "^GROQ_API_KEY=..*" .env 2>/dev/null; then \
-		echo "ERROR: GROQ_API_KEY is required for live demo mode."; \
-		echo "Please set GROQ_API_KEY in your environment or in .env (e.g. GROQ_API_KEY=gsk_...)"; \
+	@if [ -z "$$GROQ_API_KEY" ] && [ -z "$$LLM_API_KEY" ] && ! grep -q "^GROQ_API_KEY=..*" .env 2>/dev/null && ! grep -q "^LLM_API_KEY=..*" .env 2>/dev/null; then \
+		echo "ERROR: GROQ_API_KEY or LLM_API_KEY is required for live demo mode."; \
+		echo "Please set GROQ_API_KEY or LLM_API_KEY in your environment or in .env (e.g. GROQ_API_KEY=gsk_...)"; \
 		exit 1; \
 	fi
 	@echo "======================================================================"

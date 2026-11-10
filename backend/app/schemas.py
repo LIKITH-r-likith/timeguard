@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import date, datetime
 from typing import Any, Literal, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from backend.core.models import (
     ErrorResponse,
@@ -127,3 +127,96 @@ class EvalReport(BaseModel):
     injection_resistance: Optional[float] = None
     denominators: Optional[dict[str, str]] = None
     ablation: Optional[dict[str, Any]] = None
+
+
+# ---------------- Sandbox Scenarios ----------------
+class ScenarioPunchInput(BaseModel):
+    id: Optional[str] = None
+    type: PunchType
+    at: datetime
+
+    @field_validator("at")
+    @classmethod
+    def check_tz(cls, v: datetime) -> datetime:
+        if v.tzinfo is None:
+            raise ValueError("Timestamp must include timezone offset (e.g. +05:30, Z)")
+        return v
+
+
+class ScenarioShiftInput(BaseModel):
+    id: Optional[str] = None
+    start: datetime
+    end: datetime
+    scheduled_break_minutes: int = 0
+
+    @field_validator("start", "end")
+    @classmethod
+    def check_tz(cls, v: datetime) -> datetime:
+        if v.tzinfo is None:
+            raise ValueError("Timestamp must include timezone offset (e.g. +05:30, Z)")
+        return v
+
+
+class ScenarioLeaveInput(BaseModel):
+    id: Optional[str] = None
+    start: datetime
+    end: datetime
+    kind: str = "PAID"
+
+    @field_validator("start", "end")
+    @classmethod
+    def check_tz(cls, v: datetime) -> datetime:
+        if v.tzinfo is None:
+            raise ValueError("Timestamp must include timezone offset (e.g. +05:30, Z)")
+        return v
+
+
+class ScenarioTimecardInput(BaseModel):
+    id: Optional[str] = None
+    employee_id: Optional[str] = None
+    jurisdiction: str
+    period_start: date
+    period_end: date
+    locked: bool = False
+    shifts: list[ScenarioShiftInput] = Field(default_factory=list)
+    punches: list[ScenarioPunchInput] = Field(default_factory=list, max_length=20)
+    notes: list[str] = Field(default_factory=list)
+    leaves: list[ScenarioLeaveInput] = Field(default_factory=list)
+
+    @field_validator("notes")
+    @classmethod
+    def check_notes(cls, v: list[str]) -> list[str]:
+        for n in v:
+            if len(n) > 500:
+                raise ValueError("Employee note must not exceed 500 characters")
+        return v
+
+
+class ScenarioRequest(BaseModel):
+    case_id: Optional[str] = None
+    description: Optional[str] = None
+    timecard: Optional[ScenarioTimecardInput] = None
+    employee_id: Optional[str] = None
+    jurisdiction: Optional[str] = None
+    period_start: Optional[date] = None
+    period_end: Optional[date] = None
+    locked: Optional[bool] = None
+    shifts: Optional[list[ScenarioShiftInput]] = None
+    punches: Optional[list[ScenarioPunchInput]] = Field(default=None, max_length=20)
+    notes: Optional[list[str]] = None
+
+    @field_validator("notes")
+    @classmethod
+    def check_notes(cls, v: Optional[list[str]]) -> Optional[list[str]]:
+        if v is not None:
+            for n in v:
+                if len(n) > 500:
+                    raise ValueError("Employee note must not exceed 500 characters")
+        return v
+
+
+class ScenarioResponse(BaseModel):
+    timecard_id: str
+    employee_id: str
+    exceptions_detected: int
+    exception_ids: list[str]

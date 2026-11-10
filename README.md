@@ -53,3 +53,21 @@ To test offline without an API key:
 ```bash
 python -m backend.agent.try_case evals/golden/try_example.json --mock
 ```
+
+### 4. Interactive "Try Your Own Scenario" Web Console & API
+Judges and managers can test arbitrary custom scenarios directly in the web UI or via `POST /sandbox/scenarios`:
+- **Web UI Tab ("Try Your Own Scenario")**:
+  - **Form Builder**: Configure jurisdiction (`CA`, `KA`, or unmapped `XX`), pay period, locked status, shift times, and punch sequences (with Add/Remove buttons, up to 20 punches), plus employee notes (up to 500 characters).
+  - **3 One-Click Presets**:
+    1. *Missed Punch*: California 9-to-5 shift with a missing clock-out punch.
+    2. *Overtime & Manipulative Note*: 12-hour day paired with an adversarial prompt injection attempting to force unreviewed overtime approval.
+    3. *Unknown Jurisdiction*: Remote branch in an unsupported territory (`XX`), demonstrating fail-safe fallback and escalation.
+  - **JSON Editor**: Toggle between the form builder and a raw JSON editor to paste or tweak scenarios matching the `evals/golden/try_example.json` schema.
+  - **Safe Execution**: Ingestion runs the rules engine `detect()`, flags records as `sandbox=true`, and writes a tamper-evident audit log entry (`SCENARIO_CREATED`) without calling the LLM. The resulting exception can be immediately opened in the resolution modal to run the agent, view the model badge, and inspect the 7 deterministic validator checks.
+- **REST API Endpoint (`POST /sandbox/scenarios`)**:
+  - Restricted to `MANAGER` or `HR` roles (`X-Role: MANAGER`).
+  - Validates limits (max 20 punches, notes <= 500 chars, timestamps with ISO timezone offsets).
+  - Ingests isolated employee/timecard/shift/punches and returns detected exception IDs.
+- **Custom LLM Provider Support (`LLM_BASE_URL` & `LLM_API_KEY`)**:
+  - Point to any OpenAI-compatible provider (Groq, vLLM, Ollama, OpenRouter) by setting `LLM_BASE_URL` and `LLM_API_KEY` (or `GROQ_API_KEY`) in `.env`.
+

@@ -328,6 +328,32 @@ paths:
         '404':
           $ref: '#/components/responses/Error'
 
+  /sandbox/scenarios:
+    post:
+      tags: [sandbox]
+      summary: Ingest an isolated custom timecard scenario for trial
+      description: MANAGER or HR only. Ingests a trial timecard, runs rules engine detect(), creates isolated exception records, and records audit trail. Never calls the LLM.
+      operationId: createSandboxScenario
+      parameters:
+        - $ref: '#/components/parameters/Role'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScenarioRequest'
+      responses:
+        '200':
+          description: Scenario ingested and exceptions detected
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScenarioResponse'
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+
 components:
   parameters:
     Role:
@@ -697,3 +723,84 @@ components:
         details:
           type: object
           additionalProperties: true
+
+    # ---------------- Sandbox Scenarios ----------------
+    ScenarioShiftInput:
+      type: object
+      required: [start, end]
+      properties:
+        id: {type: string}
+        start: {type: string, format: date-time}
+        end: {type: string, format: date-time}
+        scheduled_break_minutes: {type: integer, default: 0}
+
+    ScenarioPunchInput:
+      type: object
+      required: [type, at]
+      properties:
+        id: {type: string}
+        type: {type: string, enum: [IN, OUT, BREAK_START, BREAK_END]}
+        at: {type: string, format: date-time}
+
+    ScenarioTimecardInput:
+      type: object
+      required: [jurisdiction, period_start, period_end]
+      properties:
+        id: {type: string}
+        employee_id: {type: string}
+        jurisdiction: {type: string}
+        period_start: {type: string, format: date}
+        period_end: {type: string, format: date}
+        locked: {type: boolean, default: false}
+        shifts:
+          type: array
+          items: {$ref: '#/components/schemas/ScenarioShiftInput'}
+        punches:
+          type: array
+          maxItems: 20
+          items: {$ref: '#/components/schemas/ScenarioPunchInput'}
+        notes:
+          type: array
+          items: {type: string, maxLength: 500}
+        leaves:
+          type: array
+          items:
+            type: object
+            properties:
+              id: {type: string}
+              start: {type: string, format: date-time}
+              end: {type: string, format: date-time}
+              kind: {type: string}
+
+    ScenarioRequest:
+      type: object
+      properties:
+        case_id: {type: string}
+        description: {type: string}
+        timecard: {$ref: '#/components/schemas/ScenarioTimecardInput'}
+        employee_id: {type: string}
+        jurisdiction: {type: string}
+        period_start: {type: string, format: date}
+        period_end: {type: string, format: date}
+        locked: {type: boolean}
+        shifts:
+          type: array
+          items: {$ref: '#/components/schemas/ScenarioShiftInput'}
+        punches:
+          type: array
+          maxItems: 20
+          items: {$ref: '#/components/schemas/ScenarioPunchInput'}
+        notes:
+          type: array
+          items: {type: string, maxLength: 500}
+
+    ScenarioResponse:
+      type: object
+      required: [timecard_id, employee_id, exceptions_detected, exception_ids]
+      properties:
+        timecard_id: {type: string}
+        employee_id: {type: string}
+        exceptions_detected: {type: integer}
+        exception_ids:
+          type: array
+          items: {type: string}

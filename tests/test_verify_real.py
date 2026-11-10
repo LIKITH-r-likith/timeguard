@@ -66,6 +66,9 @@ def test_run_try_case_missing_api_key(monkeypatch):
 
 def test_proposal_and_trace_model_badge():
     """Test that resolving an exception records the model badge on both ProposalRecord and RunTrace."""
+    from backend.app.db import SessionLocal
+    from backend.app.models import ProposalModel
+
     client = TestClient(app)
     # 1. Scan demo period to detect exceptions
     scan_res = client.post(
@@ -75,8 +78,12 @@ def test_proposal_and_trace_model_badge():
     )
     assert scan_res.status_code == 200
 
-    # 2. Resolve an exception
+    # 2. Resolve an exception (clean up any previous proposal state)
     exc_id = "exc_tc_e01_MISSED_PUNCH_2026-11-03"
+    with SessionLocal() as db_session:
+        db_session.query(ProposalModel).filter(ProposalModel.exception_id == exc_id).delete()
+        db_session.commit()
+
     res = client.post(
         f"/exceptions/{exc_id}/resolve",
         headers={"X-Actor-Id": "m01", "X-Role": "MANAGER"},

@@ -95,12 +95,12 @@ def run_try_case(
         llm = MockLLM()
         client_label = "Mock model"
     else:
-        api_key = os.environ.get("GROQ_API_KEY")
+        api_key = os.environ.get("LLM_API_KEY") or os.environ.get("GROQ_API_KEY")
         if not api_key:
             print(
-                "\nERROR: GROQ_API_KEY environment variable is missing.\n"
-                "To run live with Groq:\n"
-                "  1. Set your key in .env (GROQ_API_KEY=gsk_...)\n"
+                "\nERROR: GROQ_API_KEY or LLM_API_KEY environment variable is missing.\n"
+                "To run live with Groq or any OpenAI-compatible provider:\n"
+                "  1. Set your key in .env (GROQ_API_KEY=gsk_... or LLM_API_KEY=...)\n"
                 "  2. Or export GROQ_API_KEY=gsk_... in your terminal\n"
                 "  3. Or run with --mock for offline dry-run testing\n",
                 file=sys.stderr,
