@@ -31,7 +31,7 @@ frontend:
 	fi
 
 eval:
-	$(PYTHON) -m evals.runner.run_eval --mode mock
+	$(PYTHON) -m evals.runner.run_eval --mode replay --ablation
 
 demo: seed
 	@echo "======================================================================"

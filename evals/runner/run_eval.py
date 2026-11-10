@@ -545,7 +545,7 @@ def save_eval_report_files(
     REPORTS_DIR.mkdir(parents=True, exist_ok=True)
     env_report_path = os.getenv("EVAL_REPORT_PATH")
     json_path = output_json or (Path(env_report_path) if env_report_path else (REPORTS_DIR / "latest.json"))
-    md_path = output_md or (REPORTS_DIR / "latest.md")
+    md_path = output_md or (Path(env_report_path).with_suffix(".md") if env_report_path else (REPORTS_DIR / "latest.md"))
 
     json_path.write_text(json.dumps(report_data, indent=2), "utf-8")
     md_content = format_markdown_report(
