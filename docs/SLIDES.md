@@ -106,9 +106,9 @@
 **Empirical Ablation: Demonstrating the Measurable Impact of the Harness**
 
 ### Key Bullets
-- **Zero Unsafe Proposals**: In benchmarking across 44 detected exceptions, TimeGuard prevented **5 unsafe proposals (0 of 44 vs 5 of 44, 11.4%)** that raw foundation models would have allowed to reach decision.
+- **Zero Unsafe Proposals**: In benchmarking across 44 detected exceptions, TimeGuard prevented **4 unsafe proposals (0 of 44 vs 4 of 44, 9.1%)** that raw foundation models would have allowed to reach decision.
 - **100% Injection Neutralization**: The harness achieved **4 of 4 (100.0%)** resistance against prompt injection attacks, compared to **0 of 4 (0.0%)** for the unassisted LLM alone.
-- **100% Post-Repair Validation**: The model achieved 97.7% (43 of 44) first-attempt pass rate and **100.0% (44 of 44)** after one repair, resolving 6 of 6 escalations cleanly.
+- **100% Validation Compliance**: The model achieved a **100.0% (44 of 44)** first-attempt pass rate in the final recorded run, resolving 6 of 6 escalations cleanly (repair paths are fully exercised by unit tests).
 - **Provable Auditability**: Hallucinated evidence was kept at **0 of 44 (0.0%)**, and state transitions were cryptographically verified via `GET /audit/verify`.
 
 ### Slide Figure
@@ -117,13 +117,13 @@
 ┌──────────────────────────────────────┬──────────────────────┬──────────────────────┬──────────────────────┐
 │ Evaluation Metric                    │ TimeGuard (Harness)  │ Baseline (LLM Alone) │ Impact / Delta       │
 ├──────────────────────────────────────┼──────────────────────┼──────────────────────┼──────────────────────┤
-│ Validation Pass Rate                 │ 44 of 44 (100.0%)    │ 43 of 44 (97.7%)     │ +2.3% Compliance     │
-│ Unsafe Proposals Reaching Manager    │  0 of 44 (0.0%)      │  5 of 44 (11.4%)     │ -5 Unsafe Prevented  │
+│ Validation Pass Rate                 │ 44 of 44 (100.0%)    │ 44 of 44 (100.0%)    │ +0.0% Compliance     │
+│ Unsafe Proposals Reaching Manager    │  0 of 44 (0.0%)      │  4 of 44 (9.1%)      │ -4 Unsafe Prevented  │
 │ Prompt Injection Resistance          │  4 of 4  (100.0%)    │  0 of 4  (0.0%)      │ +100.0% Neutralized  │
 │ Hallucinated Evidence Rate           │  0 of 44 (0.0%)      │  0 of 44 (0.0%)      │ Zero Hallucination   │
 │ Human Approval Gate                  │ Enforced (Read-Only) │ Direct / Unvalidated │ Guaranteed Safety    │
 └──────────────────────────────────────┴──────────────────────┴──────────────────────┴──────────────────────┘
-*The baseline count came from one recorded run and the model is nondeterministic (it varied 5 to 7 across sessions); the 51 cases are a development set, not held-out.*
+*The baseline count comes from recorded runs, the model is nondeterministic, and the count varied between 4 and 7 across sessions; the 51 cases are a development set, not held-out.*
 ```
 
 ---

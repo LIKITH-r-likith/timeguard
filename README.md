@@ -224,7 +224,7 @@ Evaluated across the 51-case development set (yielding 44 detected exception rec
 |---|:---:|:---:|:---:|
 | **Detection Recall (Rules Engine)** | `44 of 44` | **100.0%** | 100.0% |
 | **Detection Precision (Rules Engine)** | `44 of 44` | **100.0%** | 100.0% |
-| **First-Attempt Pass Rate** | `43 of 44` | **97.7%** | &ge; 70.0% |
+| **First-Attempt Pass Rate** | `44 of 44` | **100.0%** | &ge; 70.0% |
 | **Pass Rate After 1 Repair** | `44 of 44` | **100.0%** | &ge; 95.0% |
 | **Correct Action Rate** | `44 of 44` | **100.0%** | &ge; 90.0% |
 | **Hallucinated Evidence Rate** | `0 of 44` | **0.0%** | 0.0% |
@@ -236,9 +236,9 @@ Evaluated across the 51-case development set (yielding 44 detected exception rec
 
 | Evaluation Metric | TimeGuard (With Harness) | Baseline (LLM Alone) | Impact / Delta |
 |---|:---:|:---:|:---:|
-| **Pass Rate (Validation)** | **`44 of 44` (100.0%)** | `43 of 44` (97.7%) | **+2.3%** |
-| **Unsafe Proposals Reaching Manager** | **`0 of 44` (0.0%)** | `5 of 44` (11.4%) | **-5 unsafe proposals prevented** |
-| **Prompt Injection Resistance** | **`4 of 4` (100.0%)** | `0 of 4` (0.0%) | **+100.0%** |
+| **Pass Rate (Validation)** | **`44 of 44` (100.0%)** | `44 of 44` (100.0%) | +0.0% |
+| **Unsafe Proposals Reaching Manager** | **`0 of 44` (0.0%)** | `4 of 44` (9.1%) | **-4 unsafe proposals prevented** |
+| **Prompt Injection Resistance** | **`4 of 4` (100.0%)** | `0 of 4` (0.0%) | +100.0% |
 | **Hallucinated Evidence Rate** | **`0 of 44` (0.0%)** | `0 of 44` (0.0%) | 0.0% |
 | **Human-in-the-Loop Gate** | **Enforced (Read-Only LLM)** | Direct / Unvalidated | Guaranteed Safety |
 
@@ -254,7 +254,8 @@ The baseline represents raw foundation model performance without the TimeGuard h
   4. *Locked-Period Rule Bypassed*: No deterministic escalation for locked pay cycles.
 
 ### Honest Caveats & Scientific Rigor
-- The baseline count came from one recorded run and the model is nondeterministic (it varied 5 to 7 across sessions); the 51 cases are a development set, not held-out.
+- The baseline count comes from recorded runs, the model is nondeterministic, and the count varied between 4 and 7 across sessions; the 51 cases are a development set, not held-out.
+- No repair was needed in the final recorded eval run as the model achieved 100% on its first attempt; the repair path is exercised and verified by unit tests (e.g. `test_loop_repair_attempt`).
 - **Hardened Patterns**: Prompt injection filters and rationale scanners were iteratively expanded during the independent architectural review (see [docs/REVIEW.md](docs/REVIEW.md)).
 
 ---
@@ -263,7 +264,7 @@ The baseline represents raw foundation model performance without the TimeGuard h
 
 TimeGuard enforces safety through 6 complementary architectural barriers:
 
-1. **Strictly Read-Only Tools**: The model is provided 5 read-only tools (`get_timecard`, `get_schedule`, `get_leave`, `get_history`, `search_policy`). It has zero database write tools.
+1. **Strictly Read-Only Tools**: The model is provided 5 read-only tools (`get_timecard`, `get_schedule`, `get_leave`, `get_history`, `search_policy`). It has zero database write tools. Retrieval uses keyword search by default so results are reproducible; set `TIMEGUARD_EMBEDDINGS=1` and install `requirements-optional.txt` to enable embeddings.
 2. **Untrusted Data Boundaries**: Employee notes are wrapped in `<untrusted_employee_note>` delimiters. A regex-based safety scanner detects prompt injection patterns and forces immediate escalation before LLM invocation.
 3. **Deterministic Locked-Period Guard**: If `timecard.locked == True`, the loop halts immediately and forces `ESCALATE_TO_HR` without calling the LLM.
 4. **7-Check Deterministic Validator**: Checks that proposed changes match the action, resolve the target exception, introduce no new exceptions, cite valid evidence, cite valid policy clauses, fall within shift boundaries, and respect locked periods.

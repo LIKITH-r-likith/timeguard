@@ -37,7 +37,7 @@ Open your browser to:
 | **04:30 - 06:00** | 1:30 | **Story 2: Overtime Repair** | Overtime risk -> First attempt fails validator -> Repair attempt succeeds. |
 | **06:00 - 07:30** | 1:30 | **Story 3: Prompt Injection** | Adversarial note -> Pre-LLM scanner intercepts -> Escalated to HR. |
 | **07:30 - 08:30** | 1:00 | **Try Your Own Scenario** | Interactive tab -> 3 presets -> Ingest unsupported jurisdiction `XX` case. |
-| **08:30 - 09:30** | 1:00 | **Audit & Observability** | SHA-256 chain verification -> Ablation comparison table (0 vs 5 unsafe). |
+| **08:30 - 09:30** | 1:00 | **Audit & Observability** | SHA-256 chain verification -> Ablation comparison table (0 vs 4 unsafe). |
 | **09:30 - 10:00** | 0:30 | **Conclusion & Quality** | 212 tests, 93% coverage, zero unapproved writes, production readiness. |
 
 ---
@@ -174,18 +174,18 @@ Open your browser to:
 2. Click the button: **Verify Audit Chain**. Show green verification badge: `"Cryptographic Audit Chain Intact: All records verified with zero tampering."`
 3. Click **Observability** tab.
 4. Scroll to the **Ablation Comparison** table:
-   - Point out **Unsafe Proposals Reaching Manager**: TimeGuard `0 of 44` (0.0%) vs Baseline LLM Alone `5 of 44` (11.4%).
+   - Point out **Unsafe Proposals Reaching Manager**: TimeGuard `0 of 44` (0.0%) vs Baseline LLM Alone `4 of 44` (9.1%).
    - Point out **Prompt Injection Resistance**: TimeGuard `4 of 4` (100%) vs Baseline `0 of 4` (0%).
-   - Point out **Validation Pass Rate**: `100.0%` (44 of 44) after repair vs `97.7%` (43 of 44) baseline.
+   - Point out **Validation Pass Rate**: `100.0%` (44 of 44) on both sides.
 
 **Speaker:**
 > "Every action we just performed is logged in our cryptographic audit trail.
 >
 > In the Audit Trail view, each entry has a SHA-256 hash calculated from the previous row's hash plus payload. I click 'Verify Audit Chain'. The backend verifies every link in the sequence—proving zero data tampering.
 >
-> Finally, look at our Observability tab. We evaluated 44 exceptions across California and Kansas in our ablation study. Note that the baseline count came from one recorded run and the model is nondeterministic (it varied 5 to 7 across sessions); the 51 cases are a development set, not held-out.
+> Finally, look at our Observability tab. We evaluated 44 exceptions across California and Kansas in our ablation study. Note that the baseline count comes from recorded runs, the model is nondeterministic, and the count varied between 4 and 7 across sessions; the 51 cases are a development set, not held-out. In this final recorded eval run, the model passed all 44 validation checks on attempt 1, so the repair loop was not invoked here, but its behavior is fully covered by our test suite.
 >
-> Look at the delta: without the TimeGuard harness, the raw LLM allowed **5 unsafe proposals** to reach the manager queue—an 11.4% failure rate. With TimeGuard, **zero unsafe proposals reach the manager (0 of 44)**. In prompt injection tests, raw LLM resistance is **0%**; with TimeGuard, it is **100% (4 of 4)**."
+> Look at the delta: without the TimeGuard harness, the raw LLM allowed **4 unsafe proposals** to reach the manager queue—a 9.1% failure rate. With TimeGuard, **zero unsafe proposals reach the manager (0 of 44)**. In prompt injection tests, raw LLM resistance is **0%**; with TimeGuard, it is **100% (4 of 4)**."
 
 ---
 
