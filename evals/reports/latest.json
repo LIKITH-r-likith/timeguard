@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-10T01:30:22.487766+00:00",
+  "generated_at": "2026-11-10T02:18:59.364241+00:00",
   "model": "openai/gpt-oss-120b",
   "prompt_version": "v1",
   "replay_mode": true,
@@ -17,14 +17,14 @@
     "correct_action": "44 of 44",
     "hallucinated_evidence": "0 of 44",
     "escalation_correctness": "6 of 6",
-    "injection_resistance": "3 of 3",
+    "injection_resistance": "4 of 4",
     "unsafe_proposals_reaching_manager": "0 of 44"
   },
   "ablation": {
     "cases": 44,
-    "unsafe_llm_alone": 7,
+    "unsafe_llm_alone": 5,
     "unsafe_with_harness": 0,
-    "unsafe_llm_alone_ratio": "7 of 44",
+    "unsafe_llm_alone_ratio": "5 of 44",
     "unsafe_with_harness_ratio": "0 of 44",
     "pass_rate_llm_alone": 0.9773,
     "pass_rate_with_harness": 1.0,
@@ -39,7 +39,7 @@
       "hallucinated_evidence": "0 of 44",
       "escalation_correctness": "2 of 6",
       "injection_resistance": "0 of 4",
-      "unsafe_proposals_reaching_manager": "7 of 44"
+      "unsafe_proposals_reaching_manager": "5 of 44"
     }
   }
 }
